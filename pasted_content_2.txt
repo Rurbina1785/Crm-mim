@@ -1,0 +1,70 @@
+Text file: pasted_content_2.txt
+Latest content with line numbers:
+1	Reunión de videoconferencia para alineación y confirmación de requerimientos con el área de Ventas. 
+2	
+3	
+4	Asistieron a la reunión el Director de Ventas (Manuel Morell) y su Gerente principal de Ventas (Jorge Psihas) de parte del área de negocio; y Rubén Urbina de Sistemas + Fabián Romero y Eric Rodríguez.
+5	
+6	
+7	---------------------------------
+8	
+9	
+10	La primera parte de la reunión se llevó a cabo con Jorge únicamente a quien se le explicó el alcance. Confirmó que el objetivo principal es contar con un sistema para la gestión de:
+11	
+12	Contactos y clientes
+13	
+14	Calendario de citas e historial de comunicación de vendedores hacia clientes
+15	
+16	Seguimiento de cotizaciones hasta ventas finales
+17	
+18	Módulo de Análisis y Reportes con vista para Gerentes y Directores.
+19	
+20	
+21	Jorge preguntó por la posibilidad de agregar “Geolocalización” de los vendedores para confirmar que realmente se encontraban en la ubicación de los clientes cuando dicen haber asistido a una reunión presencial. - Se informó que existe la posibilidad técnicamente pero que esa funcionalidad NO estaba contemplada en el alcance original. Se quedó de evaluar para ver si se puede agregar en esta etapa o posteriormente.
+22	
+23	
+24	
+25	
+26	
+27	Posteriormente se incorporó Manuel a la reunión quien hizo varios comentarios, aclaraciones y solicitudes puntuales que se enlistan a continuación:
+28	
+29	
+30	Se sugiere dividir (o al menos poder catalogar con un campo) si un contacto es Prospecto (Lead) o ya es Cliente Activo (tiene al menos una venta cerrada con MiM).
+31	
+32	
+33	Actualmente Manuel y Jorge tienen visibilidad de los clientes a partir de que se les realiza una cotización, por eso para ellos es importante poder cargar información de contactos y asignación a vendedores desde la etapa de prospección o incluso antes (Marketing).
+34	
+35	
+36	Es importante conocer el origen del Lead, si se generó en una expo, a través de una campaña, por recomendación o por un email entrante a la compañía.
+37	
+38	
+39	A cada Lead le corresponde exactamente UN vendedor que tiene que ser asignado de inmediato.
+40	
+41	
+42	Manuel y Jorge son los únicos que pueden asignarle Vendedores a los Leads.
+43	
+44	No hay casi ventas de Mostrador (representan entre 3 y 5% del total) pero incluso en estos casos se les asigna un Vendedor o un Cotizador a cada Cliente.
+45	
+46	
+47	Es importante contar con el histórico de Visitas creadas por los Vendedores. Sugieren dividir por Visitas Presenciales, Visitas Virtuales (por videoconferencia), Llamadas, Mails, mensajes directos (Whatsapp, etc).
+48	
+49	
+50	Cada Visita o punto de contacto que se tiene con los Clientes debe tener la fecha y hora de la “Visita” y dos tipos de campos de Texto: el campo de Comunicación escrita con el cliente por mail, chat, etc y el campo de Notas creadas por el Vendedor como minutas de la llamada, visita, etc. (IDEALMENTE TAMBIÉN SE DEBE DE PODER ADJUNTAR DOCUMENTOS DE CADA VISITA, COMO FOTOS, COTIZACIONES, DOCUMENTACIÓN RECIBIDA O ENVIADA A LOS CLIENTES, ETC)
+51	
+52	
+53	Actualmente la información de ventas se lleva en un excel compartido, por lo que todos los vendedores tienen acceso a la información de los demás. Con la implementación de este CRM esperan que YA NO se pueda ver lo que hace el “vecino”.
+54	
+55	
+56	Manuel hace junta de revisión de “Funnel” con sus Gerentes (Jorge y Guillermo) una vez por semana y de la misma forma ellos hacen junta con los vendedores también una vez por semana.
+57	
+58	
+59	No quieren perder el “layout” del excel que usan actualmente para sus reportes. Comentaron que Rubén les ayudó a extraer cierta información del sistema que se carga automáticamente en el Excel. Hay que preguntar detalles de esto a Rubén para poder replicarlo.
+60	
+61	
+62	Cada objeto de tipo “Contacto” debe incluir además del Nombre del Contacto, su Puesto, Departamento dentro de su empresa, Nivel de Toma de Decisiones (proponer una clasificación) y esto debe permitir poder conocer eventualmente el “Organigrama Organizacional” de cada Cliente. - Nos contaron de un proveedor que tienen que por política institucional incentivan a que sus vendedores conozcan a todos lo “actores” involucrados en las compras de sus clientes (los Buyer Personas).
+63	
+64	
+65	También nos contaron que la mayoría de sus Clientes tienen como punto decisivo principal para realizar la compra la Velocidad en que se les entrega la Cotización, por lo tanto nos pidieron realizar sugerencias para hacer más eficientes y con menos errores las entregas de cotizaciones. - Un agente de IA al que se le pueda pedir replicar cotizaciones anteriores o tomar elementos previos fue una de las ideas que se mencionaron.
+66	
+67	
+68	Otro punto importante que se solicitó es poder ver el Histórico de Precios de Cotización comparados vs los Precios finales de Venta para poder realizar análisis y estrategias de los descuentos solicitados. - A veces las áreas de compras “piden” ciertos porcentajes mínimos de descuento, por lo que sería ideal poder tener pre-cargadas estas “políticas” conocidas de cada cliente para entregar precios de referencia “mayores” a los que después se les aplique un “descuento” mayor para quedar en el precio final Target deseado.

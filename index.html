@@ -1,0 +1,1952 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Demo - Sistema de Gestión de Ventas</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <!-- Custom CSS -->
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <i class="fas fa-chart-line me-2"></i>
+                <span class="brand-text">CRM Demo</span>
+            </div>
+            <button class="sidebar-toggle d-lg-none" id="sidebarToggle">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="sidebar-content">
+            <nav class="sidebar-nav">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#dashboard" data-section="dashboard">
+                            <i class="fas fa-tachometer-alt nav-icon"></i>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#portfolio" data-section="portfolio">
+                            <i class="fas fa-users nav-icon"></i>
+                            <span class="nav-text">Portafolio</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#leads" data-section="leads">
+                            <i class="fas fa-user-plus nav-icon"></i>
+                            <span class="nav-text">Leads</span>
+                            <span class="badge bg-primary ms-auto">5</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#tasks" data-section="tasks">
+                            <i class="fas fa-tasks nav-icon"></i>
+                            <span class="nav-text">Tareas</span>
+                            <span class="badge bg-warning ms-auto">12</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#calendar" data-section="calendar">
+                            <i class="fas fa-calendar nav-icon"></i>
+                            <span class="nav-text">Calendario</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#activity" data-section="activity">
+                            <i class="fas fa-comments nav-icon"></i>
+                            <span class="nav-text">Actividad</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reports" data-section="reports">
+                            <i class="fas fa-chart-bar nav-icon"></i>
+                            <span class="nav-text">Reportes</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#products" data-section="products">
+                            <i class="fas fa-box nav-icon"></i>
+                            <span class="nav-text">Productos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#notifications" data-section="notifications">
+                            <i class="fas fa-bell nav-icon"></i>
+                            <span class="nav-text">Notificaciones</span>
+                            <span class="badge bg-danger ms-auto">3</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#visits" data-section="visits">
+                            <i class="fas fa-handshake nav-icon"></i>
+                            <span class="nav-text">Visitas</span>
+                            <span class="badge bg-info ms-auto">8</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#quotations" data-section="quotations">
+                            <i class="fas fa-file-invoice-dollar nav-icon"></i>
+                            <span class="nav-text">Cotizaciones</span>
+                            <span class="badge bg-success ms-auto">15</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#ai-assistant" data-section="ai-assistant">
+                            <i class="fas fa-robot nav-icon"></i>
+                            <span class="nav-text">Asistente IA</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle d-lg-none" id="sidebarToggleMobile">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+            </div>
+            
+            <div class="header-right">
+                <div class="header-actions">
+                    <button class="btn btn-outline-secondary me-2" id="searchToggle">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary me-2" id="notificationsToggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">3</span>
+                    </button>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-2"></i>Juan Pérez
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Perfil</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Configuración</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <main class="content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card bg-primary text-white h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <div class="text-white-75 small">Ventas del Mes</div>
+                                        <div class="text-lg fw-bold">$125,430</div>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-dollar-sign fa-2x text-white-50"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <small><i class="fas fa-arrow-up me-1"></i>12% vs mes anterior</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card bg-success text-white h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <div class="text-white-75 small">Clientes Activos</div>
+                                        <div class="text-lg fw-bold">47</div>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-users fa-2x text-white-50"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <small><i class="fas fa-arrow-up me-1"></i>5% vs mes anterior</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card bg-warning text-white h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <div class="text-white-75 small">Cotizaciones Pendientes</div>
+                                        <div class="text-lg fw-bold">23</div>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-file-invoice fa-2x text-white-50"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <small><i class="fas fa-arrow-down me-1"></i>3% vs mes anterior</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card bg-info text-white h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <div class="text-white-75 small">Citas Esta Semana</div>
+                                        <div class="text-lg fw-bold">12</div>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-calendar-check fa-2x text-white-50"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <small><i class="fas fa-arrow-up me-1"></i>8% vs semana anterior</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-8 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-chart-line me-2"></i>Embudo de Ventas
+                                </h5>
+                            </div>
+                            <div class="card-body" style="height: 300px; position: relative;">
+                                <canvas id="salesFunnelChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-chart-pie me-2"></i>Distribución por Etapa
+                                </h5>
+                            </div>
+                            <div class="card-body" style="height: 300px; position: relative;">
+                                <canvas id="stageDistributionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Portfolio Section -->
+            <section id="portfolio" class="content-section">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="mb-0">Portafolio de Clientes</h2>
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Nuevo Cliente
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Buscar clientes..." id="clientSearch">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="statusFilter">
+                            <option value="">Todos los estados</option>
+                            <option value="prospecto">Prospecto</option>
+                            <option value="contactado">Contactado</option>
+                            <option value="cotizado">Cotizado</option>
+                            <option value="cerrado">Cerrado</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="sortBy">
+                            <option value="name">Ordenar por Nombre</option>
+                            <option value="lastContact">Último Contacto</option>
+                            <option value="value">Valor</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row" id="clientCards">
+                    <!-- Client cards will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Leads Section -->
+            <section id="leads" class="content-section">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="mb-0">Gestión de Leads</h2>
+                            <button class="btn btn-primary" onclick="showAddLeadModal()">
+                                <i class="fas fa-plus me-2"></i>Nuevo Lead
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Buscar leads..." id="leadSearch">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="leadSourceFilter">
+                            <option value="">Todas las fuentes</option>
+                            <option value="website">Sitio Web</option>
+                            <option value="expo">Exposición/Feria</option>
+                            <option value="campaign">Campaña Marketing</option>
+                            <option value="referral">Referencia</option>
+                            <option value="social">Redes Sociales</option>
+                            <option value="email">Email Entrante</option>
+                            <option value="cold-call">Llamada Fría</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="leadStatusFilter">
+                            <option value="">Todos los estados</option>
+                            <option value="new">Nuevo</option>
+                            <option value="contacted">Contactado</option>
+                            <option value="qualified">Calificado</option>
+                            <option value="converted">Convertido</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Lista de Leads</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="leadsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Nombre</th>
+                                                <th>Empresa</th>
+                                                <th>Email</th>
+                                                <th>Fuente</th>
+                                                <th>Vendedor</th>
+                                                <th>Tipo</th>
+                                                <th>Score</th>
+                                                <th>Estado</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="leadsTableBody">
+                                            <!-- Leads will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Lead Score Distribution</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="leadScoreChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Fuentes de Leads</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="lead-source-item d-flex justify-content-between mb-2">
+                                    <span><i class="fas fa-globe text-primary me-2"></i>Sitio Web</span>
+                                    <span class="badge bg-primary">45%</span>
+                                </div>
+                                <div class="lead-source-item d-flex justify-content-between mb-2">
+                                    <span><i class="fas fa-share-alt text-success me-2"></i>Referencias</span>
+                                    <span class="badge bg-success">30%</span>
+                                </div>
+                                <div class="lead-source-item d-flex justify-content-between mb-2">
+                                    <span><i class="fas fa-hashtag text-info me-2"></i>Redes Sociales</span>
+                                    <span class="badge bg-info">15%</span>
+                                </div>
+                                <div class="lead-source-item d-flex justify-content-between">
+                                    <span><i class="fas fa-envelope text-warning me-2"></i>Email</span>
+                                    <span class="badge bg-warning">10%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tasks Section -->
+            <section id="tasks" class="content-section">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="mb-0">Gestión de Tareas</h2>
+                            <button class="btn btn-primary" onclick="showAddTaskModal()">
+                                <i class="fas fa-plus me-2"></i>Nueva Tarea
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="btn-group" role="group">
+                            <input type="radio" class="btn-check" name="taskFilter" id="allTasks" checked>
+                            <label class="btn btn-outline-secondary" for="allTasks">Todas</label>
+                            
+                            <input type="radio" class="btn-check" name="taskFilter" id="pendingTasks">
+                            <label class="btn btn-outline-warning" for="pendingTasks">Pendientes</label>
+                            
+                            <input type="radio" class="btn-check" name="taskFilter" id="completedTasks">
+                            <label class="btn btn-outline-success" for="completedTasks">Completadas</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select" id="taskPriorityFilter">
+                            <option value="">Todas las prioridades</option>
+                            <option value="high">Alta</option>
+                            <option value="medium">Media</option>
+                            <option value="low">Baja</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Lista de Tareas</h5>
+                            </div>
+                            <div class="card-body" id="tasksContainer">
+                                <!-- Tasks will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Resumen de Tareas</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <h3 class="text-warning" id="pendingTasksCount">12</h3>
+                                        <small class="text-muted">Pendientes</small>
+                                    </div>
+                                    <div class="col-4">
+                                        <h3 class="text-success" id="completedTasksCount">8</h3>
+                                        <small class="text-muted">Completadas</small>
+                                    </div>
+                                    <div class="col-4">
+                                        <h3 class="text-danger" id="overdueTasksCount">3</h3>
+                                        <small class="text-muted">Vencidas</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Tareas por Prioridad</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="taskPriorityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calendar Section -->
+            <section id="calendar" class="content-section">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="mb-0">Calendario CRM</h2>
+                            <div class="btn-group">
+                                <button class="btn btn-primary" onclick="showAddEventModal()">
+                                    <i class="fas fa-plus me-2"></i>Nuevo Evento
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="syncCalendar()">
+                                    <i class="fas fa-sync-alt me-2"></i>Sincronizar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Calendar Toolbar -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="btn-group" role="group" id="calendarViewButtons">
+                            <button class="btn btn-outline-primary" data-view="dayGridMonth">Mes</button>
+                            <button class="btn btn-outline-primary" data-view="timeGridWeek">Semana</button>
+                            <button class="btn btn-outline-primary" data-view="timeGridDay">Día</button>
+                            <button class="btn btn-outline-primary" data-view="listWeek">Lista</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-end align-items-center">
+                            <div class="btn-group me-3">
+                                <button class="btn btn-outline-secondary btn-sm" id="calendarPrev">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" id="calendarToday">Hoy</button>
+                                <button class="btn btn-outline-secondary btn-sm" id="calendarNext">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <h5 class="mb-0" id="calendarTitle">Enero 2024</h5>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Calendar and Sidebar -->
+                <div class="row">
+                    <div class="col-lg-9">
+                        <div class="card">
+                            <div class="card-body p-2">
+                                <div id="fullcalendar"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3">
+                        <!-- Event Filters -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">Filtros de Eventos</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="filterMeetings" checked>
+                                    <label class="form-check-label" for="filterMeetings">
+                                        <i class="fas fa-handshake text-primary me-2"></i>Reuniones
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="filterCalls" checked>
+                                    <label class="form-check-label" for="filterCalls">
+                                        <i class="fas fa-phone text-success me-2"></i>Llamadas
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="filterPresentations" checked>
+                                    <label class="form-check-label" for="filterPresentations">
+                                        <i class="fas fa-presentation text-info me-2"></i>Presentaciones
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="filterFollowups" checked>
+                                    <label class="form-check-label" for="filterFollowups">
+                                        <i class="fas fa-calendar-check text-warning me-2"></i>Seguimientos
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="filterDeadlines" checked>
+                                    <label class="form-check-label" for="filterDeadlines">
+                                        <i class="fas fa-exclamation-triangle text-danger me-2"></i>Vencimientos
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Upcoming Events -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">Próximos Eventos</h6>
+                            </div>
+                            <div class="card-body" id="upcomingEventsList">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <!-- Event Statistics -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">Estadísticas del Mes</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="d-flex align-items-center">
+                                        <i class="fas fa-handshake text-primary me-2"></i>
+                                        <small>Reuniones</small>
+                                    </span>
+                                    <span class="badge bg-primary" id="meetingsCount">15</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="d-flex align-items-center">
+                                        <i class="fas fa-phone text-success me-2"></i>
+                                        <small>Llamadas</small>
+                                    </span>
+                                    <span class="badge bg-success" id="callsCount">23</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="d-flex align-items-center">
+                                        <i class="fas fa-presentation text-info me-2"></i>
+                                        <small>Presentaciones</small>
+                                    </span>
+                                    <span class="badge bg-info" id="presentationsCount">8</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="d-flex align-items-center">
+                                        <i class="fas fa-calendar-check text-warning me-2"></i>
+                                        <small>Seguimientos</small>
+                                    </span>
+                                    <span class="badge bg-warning" id="followupsCount">12</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="d-flex align-items-center">
+                                        <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                                        <small>Vencimientos</small>
+                                    </span>
+                                    <span class="badge bg-danger" id="deadlinesCount">4</span>
+                                </div>
+                                
+                                <hr class="my-3">
+                                
+                                <div class="text-center">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <h6 class="text-success mb-0" id="completedEventsCount">42</h6>
+                                            <small class="text-muted">Completados</small>
+                                        </div>
+                                        <div class="col-6">
+                                            <h6 class="text-primary mb-0" id="pendingEventsCount">20</h6>
+                                            <small class="text-muted">Pendientes</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Activity Section -->
+            <section id="activity" class="content-section">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2 class="mb-0">Feed de Actividad</h2>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Actividades Recientes</h5>
+                            </div>
+                            <div class="card-body" id="activityFeed">
+                                <!-- Activity feed will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Estadísticas de Actividad</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Llamadas</span>
+                                        <span class="fw-bold">24</span>
+                                    </div>
+                                    <div class="progress mt-1">
+                                        <div class="progress-bar bg-primary" style="width: 60%"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Reuniones</span>
+                                        <span class="fw-bold">18</span>
+                                    </div>
+                                    <div class="progress mt-1">
+                                        <div class="progress-bar bg-success" style="width: 45%"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Cotizaciones</span>
+                                        <span class="fw-bold">12</span>
+                                    </div>
+                                    <div class="progress mt-1">
+                                        <div class="progress-bar bg-warning" style="width: 30%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Seguimientos</span>
+                                        <span class="fw-bold">8</span>
+                                    </div>
+                                    <div class="progress mt-1">
+                                        <div class="progress-bar bg-info" style="width: 20%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="content-section">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="mb-0">Análisis de Cotizaciones y Conversión</h2>
+                            <div class="btn-group">
+                                <button class="btn btn-outline-primary" onclick="refreshReports()">
+                                    <i class="fas fa-sync-alt me-2"></i>Actualizar
+                                </button>
+                                <button class="btn btn-success" onclick="exportReport()">
+                                    <i class="fas fa-download me-2"></i>Exportar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filtros y Controles -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <select class="form-select" id="reportPeriod">
+                            <option value="week">Esta Semana</option>
+                            <option value="month" selected>Este Mes</option>
+                            <option value="quarter">Este Trimestre</option>
+                            <option value="year">Este Año</option>
+                            <option value="custom">Período Personalizado</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="reportType">
+                            <option value="conversion">Análisis de Conversión</option>
+                            <option value="quotations">Cotizaciones</option>
+                            <option value="sales">Ventas</option>
+                            <option value="performance">Rendimiento</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="salesPersonFilter">
+                            <option value="">Todos los Vendedores</option>
+                            <option value="juan">Juan Pérez</option>
+                            <option value="maria">María García</option>
+                            <option value="carlos">Carlos Ruiz</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="clientSegment">
+                            <option value="">Todos los Segmentos</option>
+                            <option value="enterprise">Empresarial</option>
+                            <option value="medium">Mediano</option>
+                            <option value="small">Pequeño</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- KPIs Principales -->
+                <div class="row mb-4">
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card bg-gradient-primary text-white h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h3 class="mb-1">$2,847,350</h3>
+                                        <p class="mb-0">Valor Total Cotizado</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-file-invoice-dollar fa-2x opacity-75"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <small><i class="fas fa-arrow-up me-1"></i>18.5% vs mes anterior</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card bg-gradient-success text-white h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h3 class="mb-1">$1,924,580</h3>
+                                        <p class="mb-0">Ventas Cerradas</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-handshake fa-2x opacity-75"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <small><i class="fas fa-arrow-up me-1"></i>12.3% vs mes anterior</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card bg-gradient-info text-white h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h3 class="mb-1">67.6%</h3>
+                                        <p class="mb-0">Tasa de Conversión</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-percentage fa-2x opacity-75"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <small><i class="fas fa-arrow-up me-1"></i>5.2% vs mes anterior</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="card bg-gradient-warning text-white h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h3 class="mb-1">18.4 días</h3>
+                                        <p class="mb-0">Ciclo Promedio</p>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-clock fa-2x opacity-75"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <small><i class="fas fa-arrow-down me-1"></i>2.8 días menos</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Gráficos Principales -->
+                <div class="row mb-4">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Análisis de Conversión por Período</h5>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary active" onclick="changeConversionView('monthly')">Mensual</button>
+                                    <button class="btn btn-outline-primary" onclick="changeConversionView('weekly')">Semanal</button>
+                                    <button class="btn btn-outline-primary" onclick="changeConversionView('daily')">Diario</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="conversionAnalysisChart" height="80"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Distribución por Estado</h5>
+                            </div>
+                            <div class="card-body" style="height: 300px; position: relative;">
+                                <canvas id="quotationStatusChart"></canvas>
+                                <div class="mt-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="d-flex align-items-center">
+                                            <span class="badge bg-success me-2"></span>Cerradas
+                                        </span>
+                                        <span class="fw-bold">142 (67.6%)</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="d-flex align-items-center">
+                                            <span class="badge bg-warning me-2"></span>En Proceso
+                                        </span>
+                                        <span class="fw-bold">38 (18.1%)</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="d-flex align-items-center">
+                                            <span class="badge bg-danger me-2"></span>Perdidas
+                                        </span>
+                                        <span class="fw-bold">30 (14.3%)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Análisis Detallado -->
+                <div class="row mb-4">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Rendimiento por Vendedor</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="salesPersonPerformanceChart" height="120"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Valor Promedio por Segmento</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="segmentValueChart" height="120"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tabla de Cotizaciones Recientes -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Cotizaciones Recientes</h5>
+                                <button class="btn btn-sm btn-primary" onclick="showQuotationModal()">
+                                    <i class="fas fa-plus me-1"></i>Nueva Cotización
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Cliente</th>
+                                                <th>Vendedor</th>
+                                                <th>Fecha</th>
+                                                <th>Valor</th>
+                                                <th>Estado</th>
+                                                <th>Probabilidad</th>
+                                                <th>Días Activa</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="quotationsTableBody">
+                                            <!-- Populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Métricas Adicionales -->
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Tiempo de Respuesta</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="metric-item d-flex justify-content-between align-items-center mb-3">
+                                    <span>Promedio de Respuesta</span>
+                                    <span class="badge bg-success fs-6">2.3 horas</span>
+                                </div>
+                                <div class="metric-item d-flex justify-content-between align-items-center mb-3">
+                                    <span>Tiempo de Seguimiento</span>
+                                    <span class="badge bg-info fs-6">1.8 días</span>
+                                </div>
+                                <div class="metric-item d-flex justify-content-between align-items-center">
+                                    <span>Ciclo de Cierre</span>
+                                    <span class="badge bg-warning fs-6">18.4 días</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Análisis de Productos</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="productAnalysisChart" height="150"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Tendencias Mensuales</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="trend-item d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <div class="fw-bold">Cotizaciones</div>
+                                        <small class="text-muted">vs mes anterior</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold text-success">+18.5%</div>
+                                        <small class="text-muted">210 → 249</small>
+                                    </div>
+                                </div>
+                                <div class="trend-item d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <div class="fw-bold">Conversión</div>
+                                        <small class="text-muted">vs mes anterior</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold text-success">+5.2%</div>
+                                        <small class="text-muted">62.4% → 67.6%</small>
+                                    </div>
+                                </div>
+                                <div class="trend-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-bold">Valor Promedio</div>
+                                        <small class="text-muted">vs mes anterior</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold text-success">+7.8%</div>
+                                        <small class="text-muted">$11.2K → $12.1K</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products Section -->
+            <section id="products" class="content-section">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="mb-0">Catálogo de Productos</h2>
+                            <button class="btn btn-primary" onclick="showAddProductModal()">
+                                <i class="fas fa-plus me-2"></i>Nuevo Producto
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Buscar productos..." id="productSearch">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="productCategoryFilter">
+                            <option value="">Todas las categorías</option>
+                            <option value="construction">Construcción</option>
+                            <option value="tools">Herramientas</option>
+                            <option value="materials">Materiales</option>
+                            <option value="equipment">Equipos</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="productSortBy">
+                            <option value="name">Ordenar por Nombre</option>
+                            <option value="price">Precio</option>
+                            <option value="stock">Stock</option>
+                            <option value="category">Categoría</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row" id="productsGrid">
+                    <!-- Products will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Notifications Section -->
+            <section id="notifications" class="content-section">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2 class="mb-0">Centro de Notificaciones</h2>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Alertas y Recordatorios</h5>
+                            </div>
+                            <div class="card-body" id="notificationsList">
+                                <!-- Notifications will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Configuración de Notificaciones</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                                    <label class="form-check-label" for="emailNotifications">
+                                        Notificaciones por Email
+                                    </label>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="whatsappNotifications" checked>
+                                    <label class="form-check-label" for="whatsappNotifications">
+                                        Notificaciones por WhatsApp
+                                    </label>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="pushNotifications">
+                                    <label class="form-check-label" for="pushNotifications">
+                                        Notificaciones Push
+                                    </label>
+                                </div>
+                                <hr>
+                                <div class="mb-3">
+                                    <label for="followupReminder" class="form-label">Recordar seguimiento después de:</label>
+                                    <select class="form-select" id="followupReminder">
+                                        <option value="1">1 día</option>
+                                        <option value="3" selected>3 días</option>
+                                        <option value="7">1 semana</option>
+                                        <option value="14">2 semanas</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Visits Section -->
+            <section id="visits" class="content-section">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="mb-0">Historial de Visitas</h2>
+                            <button class="btn btn-primary" onclick="showAddVisitModal()">
+                                <i class="fas fa-plus me-2"></i>Nueva Visita
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Buscar visitas..." id="visitSearch">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="visitTypeFilter">
+                            <option value="">Todos los tipos</option>
+                            <option value="presencial">Presencial</option>
+                            <option value="virtual">Virtual</option>
+                            <option value="llamada">Llamada</option>
+                            <option value="email">Email</option>
+                            <option value="whatsapp">WhatsApp</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="visitClientFilter">
+                            <option value="">Todos los clientes</option>
+                            <option value="1">Constructora ABC</option>
+                            <option value="2">Desarrollos XYZ</option>
+                            <option value="3">Inmobiliaria DEF</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="date" class="form-control" id="visitDateFilter">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Lista de Visitas</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="visitsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha/Hora</th>
+                                                <th>Cliente</th>
+                                                <th>Contacto</th>
+                                                <th>Tipo</th>
+                                                <th>Vendedor</th>
+                                                <th>Estado</th>
+                                                <th>Documentos</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="visitsTableBody">
+                                            <!-- Visits will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Enhanced Quotations Section -->
+            <section id="quotations" class="content-section">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="mb-0">Gestión de Cotizaciones</h2>
+                            <div>
+                                <button class="btn btn-success me-2" onclick="showAIQuotationAssistant()">
+                                    <i class="fas fa-robot me-2"></i>Asistente IA
+                                </button>
+                                <button class="btn btn-primary" onclick="showAddQuotationModal()">
+                                    <i class="fas fa-plus me-2"></i>Nueva Cotización
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-3">
+                        <div class="card bg-primary text-white h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <div class="text-white-75 small">Cotizaciones Activas</div>
+                                        <div class="text-lg fw-bold">23</div>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-file-invoice fa-2x text-white-50"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-3">
+                        <div class="card bg-success text-white h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <div class="text-white-75 small">Cerradas Este Mes</div>
+                                        <div class="text-lg fw-bold">15</div>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-check-circle fa-2x text-white-50"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-3">
+                        <div class="card bg-warning text-white h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <div class="text-white-75 small">Tiempo Promedio</div>
+                                        <div class="text-lg fw-bold">2.3h</div>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-clock fa-2x text-white-50"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-3">
+                        <div class="card bg-info text-white h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <div class="text-white-75 small">Valor Promedio</div>
+                                        <div class="text-lg fw-bold">$187k</div>
+                                    </div>
+                                    <div class="align-self-center">
+                                        <i class="fas fa-dollar-sign fa-2x text-white-50"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Cotizaciones Recientes</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="quotationsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Cliente</th>
+                                                <th>Vendedor</th>
+                                                <th>Fecha</th>
+                                                <th>Valor Cotizado</th>
+                                                <th>Precio Final</th>
+                                                <th>Descuento</th>
+                                                <th>Estado</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="quotationsTableBody">
+                                            <!-- Quotations will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Análisis de Descuentos</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="discountAnalysisChart" style="height: 250px;"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Políticas de Descuento</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="discount-policy mb-2">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="fw-bold">Constructora ABC</span>
+                                        <span class="badge bg-primary">15-20%</span>
+                                    </div>
+                                    <small class="text-muted">Descuento estándar por volumen</small>
+                                </div>
+                                <div class="discount-policy mb-2">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="fw-bold">Desarrollos XYZ</span>
+                                        <span class="badge bg-success">10-12%</span>
+                                    </div>
+                                    <small class="text-muted">Cliente preferencial</small>
+                                </div>
+                                <div class="discount-policy mb-2">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="fw-bold">Inmobiliaria DEF</span>
+                                        <span class="badge bg-warning">8-10%</span>
+                                    </div>
+                                    <small class="text-muted">Descuento mínimo</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Assistant Section -->
+            <section id="ai-assistant" class="content-section">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2 class="mb-0">Asistente de IA</h2>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Chat con Asistente</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chat-container" id="chatContainer">
+                                    <div class="chat-message assistant-message">
+                                        <div class="message-avatar">
+                                            <i class="fas fa-robot"></i>
+                                        </div>
+                                        <div class="message-content">
+                                            <p>¡Hola! Soy tu asistente virtual de CRM. Puedo ayudarte a registrar actividades, programar seguimientos y analizar tu rendimiento de ventas. ¿En qué puedo ayudarte hoy?</p>
+                                            <small class="text-muted">Ahora</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="chat-input mt-3">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Escribe tu mensaje..." id="chatInput">
+                                        <button class="btn btn-primary" onclick="sendMessage()">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="quick-actions mt-3">
+                                    <h6>Acciones Rápidas:</h6>
+                                    <button class="btn btn-outline-primary btn-sm me-2 mb-2" onclick="sendQuickMessage('¿Cuáles son mis tareas pendientes?')">
+                                        Ver tareas pendientes
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm me-2 mb-2" onclick="sendQuickMessage('¿Qué clientes necesitan seguimiento?')">
+                                        Clientes para seguimiento
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm mb-2" onclick="sendQuickMessage('Muéstrame mi rendimiento este mes')">
+                                        Ver rendimiento del mes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Estadísticas de IA</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <h4 class="text-primary">87%</h4>
+                                        <small class="text-muted">Precisión</small>
+                                    </div>
+                                    <div class="col-6">
+                                        <h4 class="text-success">156</h4>
+                                        <small class="text-muted">Interacciones</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Sugerencias IA</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-lightbulb me-2"></i>
+                                    <strong>Sugerencia:</strong> Tienes 3 clientes sin contactar en más de 7 días. ¿Quieres programar seguimientos?
+                                </div>
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Alerta:</strong> La cotización para Desarrollos XYZ vence mañana.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Modals (same as before) -->
+    <!-- Add Visit Modal -->
+    <div class="modal fade" id="addVisitModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-handshake me-2"></i>Nueva Visita</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addVisitForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="visitClient" class="form-label">Cliente</label>
+                                    <select class="form-select" id="visitClient" required>
+                                        <option value="">Seleccionar cliente</option>
+                                        <option value="1">Constructora ABC</option>
+                                        <option value="2">Desarrollos XYZ</option>
+                                        <option value="3">Inmobiliaria DEF</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="visitContact" class="form-label">Contacto</label>
+                                    <input type="text" class="form-control" id="visitContact" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="leadSource" class="form-label">Fuente</label>
+                            <select class="form-select" id="leadSource" required>
+                                <option value="website">Sitio Web</option>
+                                <option value="expo">Exposición/Feria</option>
+                                <option value="campaign">Campaña Marketing</option>
+                                <option value="referral">Referencia</option>
+                                <option value="social">Redes Sociales</option>
+                                <option value="email">Email Entrante</option>
+                                <option value="cold-call">Llamada Fría</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="leadType" class="form-label">Tipo</label>
+                            <select class="form-select" id="leadType" required>
+                                <option value="prospect">Prospecto</option>
+                                <option value="client">Cliente Activo</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="leadVendor" class="form-label">Vendedor Asignado</label>
+                            <select class="form-select" id="leadVendor" required>
+                                <option value="">Seleccionar vendedor</option>
+                                <option value="1">Juan Pérez</option>
+                                <option value="2">María García</option>
+                                <option value="3">Carlos Ruiz</option>
+                                <option value="4">Ana López</option>
+                            </select>
+                            <div class="form-text">Solo Manuel y Jorge pueden asignar vendedores</div>
+                        </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="visitDateTime" class="form-label">Fecha y Hora</label>
+                                    <input type="datetime-local" class="form-control" id="visitDateTime" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="visitCommunication" class="form-label">Comunicación con Cliente</label>
+                            <textarea class="form-control" id="visitCommunication" rows="3" placeholder="Contenido de emails, chats, etc."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="visitNotes" class="form-label">Notas del Vendedor</label>
+                            <textarea class="form-control" id="visitNotes" rows="3" placeholder="Minutas, observaciones, próximos pasos..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="visitDocuments" class="form-label">Documentos Adjuntos</label>
+                            <input type="file" class="form-control" id="visitDocuments" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                            <div class="form-text">Puedes adjuntar fotos, cotizaciones, documentación, etc.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveVisit()">Guardar Visita</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Quotation Modal -->
+    <div class="modal fade" id="addQuotationModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-file-invoice-dollar me-2"></i>Nueva Cotización</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addQuotationForm">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="quotationClient" class="form-label">Cliente</label>
+                                    <select class="form-select" id="quotationClient" required>
+                                        <option value="">Seleccionar cliente</option>
+                                        <option value="1">Constructora ABC</option>
+                                        <option value="2">Desarrollos XYZ</option>
+                                        <option value="3">Inmobiliaria DEF</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="quotationContact" class="form-label">Contacto</label>
+                                    <input type="text" class="form-control" id="quotationContact" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="quotationValidUntil" class="form-label">Válida Hasta</label>
+                                    <input type="date" class="form-control" id="quotationValidUntil" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="quotationValue" class="form-label">Valor Cotizado</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="quotationValue" step="0.01" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="quotationDiscount" class="form-label">Descuento Aplicado (%)</label>
+                                    <input type="number" class="form-control" id="quotationDiscount" min="0" max="50" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Productos/Servicios</label>
+                            <div id="quotationProducts">
+                                <div class="row align-items-end mb-2">
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" placeholder="Producto/Servicio">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" class="form-control" placeholder="Cantidad">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" class="form-control" placeholder="Precio Unit.">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="text" class="form-control" placeholder="Total" readonly>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-success btn-sm" onclick="addProductLine()">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quotationNotes" class="form-label">Observaciones</label>
+                            <textarea class="form-control" id="quotationNotes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" onclick="generateWithAI()">Generar con IA</button>
+                    <button type="button" class="btn btn-primary" onclick="saveQuotation()">Guardar Cotización</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Quotation Assistant Modal -->
+    <div class="modal fade" id="aiQuotationModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="fas fa-robot me-2"></i>Asistente IA para Cotizaciones</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="ai-chat-container" style="height: 400px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 1rem; background-color: #f8f9fa;">
+                        <div class="ai-message mb-3">
+                            <div class="d-flex">
+                                <div class="ai-avatar me-2">
+                                    <i class="fas fa-robot text-success"></i>
+                                </div>
+                                <div class="ai-content">
+                                    <strong>Asistente IA:</strong> ¡Hola! Puedo ayudarte a crear cotizaciones rápidamente. Dime:
+                                    <ul class="mt-2 mb-0">
+                                        <li>¿Para qué cliente es la cotización?</li>
+                                        <li>¿Qué productos o servicios necesitas incluir?</li>
+                                        <li>¿Quieres replicar una cotización anterior?</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="aiChatMessages"></div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="aiChatInput" placeholder="Escribe tu consulta aquí...">
+                            <button class="btn btn-success" onclick="sendAIMessage()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h6>Acciones Rápidas:</h6>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button class="btn btn-outline-success btn-sm" onclick="aiQuickAction('replicar')">Replicar Última Cotización</button>
+                            <button class="btn btn-outline-success btn-sm" onclick="aiQuickAction('productos')">Sugerir Productos</button>
+                            <button class="btn btn-outline-success btn-sm" onclick="aiQuickAction('descuentos')">Aplicar Políticas de Descuento</button>
+                            <button class="btn btn-outline-success btn-sm" onclick="aiQuickAction('historico')">Ver Histórico de Precios</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="applyAISuggestions()">Aplicar Sugerencias</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Lead Modal -->
+    <div class="modal fade" id="addLeadModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Nuevo Lead</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addLeadForm">
+                        <div class="mb-3">
+                            <label for="leadName" class="form-label">Nombre Completo</label>
+                            <input type="text" class="form-control" id="leadName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="leadCompany" class="form-label">Empresa</label>
+                            <input type="text" class="form-control" id="leadCompany" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="leadEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="leadEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="leadPhone" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="leadPhone">
+                        </div>
+                        <div class="mb-3">
+                            <label for="leadSource" class="form-label">Fuente</label>
+                            <select class="form-select" id="leadSource" required>
+                                <option value="">Seleccionar fuente</option>
+                                <option value="website">Sitio Web</option>
+                                <option value="referral">Referencia</option>
+                                <option value="social">Redes Sociales</option>
+                                <option value="email">Email Marketing</option>
+                                <option value="cold-call">Llamada Fría</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveLead()">Guardar Lead</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div class="modal fade" id="addTaskModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-tasks me-2"></i>Nueva Tarea</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addTaskForm">
+                        <div class="mb-3">
+                            <label for="taskTitle" class="form-label">Título</label>
+                            <input type="text" class="form-control" id="taskTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="taskDescription" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="taskDescription" rows="3"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="taskPriority" class="form-label">Prioridad</label>
+                                    <select class="form-select" id="taskPriority" required>
+                                        <option value="low">Baja</option>
+                                        <option value="medium" selected>Media</option>
+                                        <option value="high">Alta</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="taskDueDate" class="form-label">Fecha Límite</label>
+                                    <input type="date" class="form-control" id="taskDueDate" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="taskClient" class="form-label">Cliente Relacionado</label>
+                            <select class="form-select" id="taskClient">
+                                <option value="">Sin cliente específico</option>
+                                <option value="1">Constructora ABC</option>
+                                <option value="2">Desarrollos XYZ</option>
+                                <option value="3">Inmobiliaria DEF</option>
+                                <option value="4">Grupo Constructor GHI</option>
+                                <option value="5">Proyectos JKL</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveTask()">Crear Tarea</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div class="modal fade" id="addEventModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-calendar me-2"></i>Nuevo Evento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addEventForm">
+                        <div class="mb-3">
+                            <label for="eventTitle" class="form-label">Título del Evento</label>
+                            <input type="text" class="form-control" id="eventTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventType" class="form-label">Tipo de Evento</label>
+                            <select class="form-select" id="eventType" required>
+                                <option value="meeting">Reunión</option>
+                                <option value="call">Llamada</option>
+                                <option value="presentation">Presentación</option>
+                                <option value="follow-up">Seguimiento</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="eventDate" class="form-label">Fecha</label>
+                                    <input type="date" class="form-control" id="eventDate" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="eventTime" class="form-label">Hora</label>
+                                    <input type="time" class="form-control" id="eventTime" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventDuration" class="form-label">Duración (minutos)</label>
+                            <input type="number" class="form-control" id="eventDuration" value="60" min="15" max="480">
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventClient" class="form-label">Cliente</label>
+                            <select class="form-select" id="eventClient">
+                                <option value="">Seleccionar cliente</option>
+                                <option value="1">Constructora ABC</option>
+                                <option value="2">Desarrollos XYZ</option>
+                                <option value="3">Inmobiliaria DEF</option>
+                                <option value="4">Grupo Constructor GHI</option>
+                                <option value="5">Proyectos JKL</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveEvent()">Crear Evento</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div class="modal fade" id="addProductModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-box me-2"></i>Nuevo Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addProductForm">
+                        <div class="mb-3">
+                            <label for="productName" class="form-label">Nombre del Producto</label>
+                            <input type="text" class="form-control" id="productName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="productCategory" class="form-label">Categoría</label>
+                            <select class="form-select" id="productCategory" required>
+                                <option value="construction">Construcción</option>
+                                <option value="tools">Herramientas</option>
+                                <option value="materials">Materiales</option>
+                                <option value="equipment">Equipos</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="productDescription" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="productDescription" rows="3"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productPrice" class="form-label">Precio</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" id="productPrice" step="0.01" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productStock" class="form-label">Stock</label>
+                                    <input type="number" class="form-control" id="productStock" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveProduct()">Guardar Producto</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer">
+        <!-- Toasts will be dynamically added here -->
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="script.js"></script>
+</body>
+</html>

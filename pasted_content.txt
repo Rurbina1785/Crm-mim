@@ -1,0 +1,57 @@
+Para el módulo de CRM se recopilaron algunos de los principales comentarios del equipo de Ventas y Dirección General:
+
+
+1. OBJETIVO Y ELEMENTOS PRINCIPALES
+Se requiere una interfaz para que los vendedores puedan gestionar sus portafolios individuales de clientes y prospectos.
+Entre otras cosas, deben poder llevar el control de las citas programadas, las visitas realizadas, notas de dichas visitas o llamadas,
+cotizaciones enviadas y órdenes de compra finales, facturas, etc. - Hoy existe un excel que se debe tratar de replicar con los campos
+utilizados actualmente.
+
+"Queremos conocer todos los contactos con los clientes como historial.
+Que los gerentes y directores puedan poner los comentarios de las visitas y la retro de las juntas.
+Que sea una info fácil de ver tipo chat y que todas las conversaciones se unan de forma omnicanal."
+   Dirección de Ventas.
+
+
+2. VISTAS Y FUNCIONALIDADES
+Debe existir una vista general para Gerentes y Directores que tengan permisos de ver conjuntos de vendedores que sean
+agrupados por ciudad, línea de productos o cualquier criterio que se desee.
+Es muy importante tener Dashboards para visualizar el "funnel" (embudo) de los vendedores de cada etapa de venta de principio a fin.
+
+"Idealmente que se vuelva el control oficial del cierre de ventas para cálculo de bonos y comisiones de los vendedores."
+
+
+3. NOTIFICACIONES Y RECORDATORIOS:
+IMPORTANTE: el punto donde se hizo más énfasis es en generar un sistema de Alertas y Notificaciones que sea configurable para
+enviar mensajes constantemente a los vendedores y a sus jefes inmediatos recordándoles de generar citas y llamadas con los clientes y el 
+tiempo que ha pasado desde su último contacto. También se podrá configurar para enviar alertas a los diferentes usuarios cuando haya 
+cambios en los estatus de los proyectos, por ejemplo que se coloque una orden de compra o que se haya realizado la entrega al cliente.
+
+- Estos mensajes deberán ser "push notifications" desde el sistema dentro de la cuenta de cada vendedor, pero idealmente también 
+conectarse a mensajería de email y Whatsapp. Forzoso que puedan utilizarlo desde su dispositivo móvil.
+
+"Necesitamos un dashboard y un sistema de alertas para cachar que no se pierdan las oportunidades y las cotizaciones.
+Hay clientes que no se les vende más porque dicen que nadie los ha ido a ver"
+   Dirección General
+
+
+NOTAS ADICIONALES:
+
+a) Formato tipo MONDAY: Se prefiere el formato de layout visual tipo "chat" conversacional como el de la herramienta MONDAY CRM que han 
+utilizado antes.
+
+b) Asistentes de IA: La experiencia indica que los vendedores no suelen llenar los campos de notas y actualizar sus ventanas de CRM,
+sería deseable que contaran con asistentes virtuales de IA y que el sistema en automático les hiciera preguntas tipo 
+"¿Cómo te fue en la cita?" etc como un chatbot de Inteligencia Artificial desde Whatsapp preferentemente (en el celular).
+
+c) Comunicación de los avances: Se solicitó de manera muy especial que por favor se vaya mostrando el plan de diseño de funcionamiento y los avances del
+sistema al Área de Ventas ANTES de su desarrollo para aprobación. Es importante la sensibilización de los usuarios en el proceso
+porque han tenido malas experiencias cuando se les "imponen" características sin consultar previamente con ellos los detalles.
+(Expectativa de versión beta, pruebas y mejoras.)
+
+d) FASE ADICIONAL DE AGENTES EXPERTOS: 
+En otra fase de desarrollo posterior a la del CRM se debe proponer la implementación de Agentes Expertos de Inteligencia
+Artificial que se entrenen con las características y especificaciones de los productos con el objetivo de que puedan dar 
+consultas técnicas a los clientes y recomendar cuáles productos y cantidades se requieren para sus proyectos. Este es un
+proyecto ambicioso pero importante que las nuevas tecnologías de IA ya permiten realizar y que daría una potencial ventaja
+competitiva a la empresa dentro del mercado.
