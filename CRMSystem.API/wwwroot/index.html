@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM System - Gestión de Relaciones con Clientes</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.8"></script>
+    
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #0dcaf0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .nav-pills .nav-link {
+            border-radius: 0.5rem;
+            margin: 0 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-pills .nav-link:hover {
+            background-color: rgba(13, 110, 253, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .nav-pills .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), #0b5ed7);
+            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
+        }
+
+        .card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 1rem 1rem 0 0 !important;
+            font-weight: 600;
+        }
+
+        .btn {
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .badge {
+            font-size: 0.75em;
+            padding: 0.5em 0.75em;
+            border-radius: 0.5rem;
+        }
+
+        .table {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: none;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(13, 110, 253, 0.05);
+        }
+
+        .modal-content {
+            border-radius: 1rem;
+            border: none;
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), #0b5ed7);
+            color: white;
+            border-radius: 1rem 1rem 0 0;
+        }
+
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            border: 1px solid #ced4da;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .stats-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .htmx-request .loading {
+            display: inline-block;
+        }
+
+        .htmx-request .content {
+            opacity: 0.5;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 1rem 0;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+            min-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-users-cog me-2"></i>
+                CRM System
+            </a>
+            
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i>
+                        <span id="current-user">Usuario</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Perfil</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Configuración</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- Sidebar Navigation -->
+            <div class="col-md-2">
+                <div class="card">
+                    <div class="card-body p-0">
+                        <ul class="nav nav-pills flex-column p-3" id="main-nav">
+                            <li class="nav-item mb-2">
+                                <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item mb-2">
+                                <a class="nav-link" href="#" onclick="showSection('leads')">
+                                    <i class="fas fa-user-plus me-2"></i>Leads
+                                    <span class="badge bg-warning ms-auto" id="leads-count">0</span>
+                                </a>
+                            </li>
+                            <li class="nav-item mb-2">
+                                <a class="nav-link" href="#" onclick="showSection('clients')">
+                                    <i class="fas fa-users me-2"></i>Clientes
+                                    <span class="badge bg-success ms-auto" id="clients-count">0</span>
+                                </a>
+                            </li>
+                            <li class="nav-item mb-2">
+                                <a class="nav-link" href="#" onclick="showSection('quotations')">
+                                    <i class="fas fa-file-invoice-dollar me-2"></i>Cotizaciones
+                                    <span class="badge bg-info ms-auto" id="quotations-count">0</span>
+                                </a>
+                            </li>
+                            <li class="nav-item mb-2">
+                                <a class="nav-link" href="#" onclick="showSection('visits')">
+                                    <i class="fas fa-calendar-check me-2"></i>Visitas
+                                    <span class="badge bg-primary ms-auto" id="visits-count">0</span>
+                                </a>
+                            </li>
+                            <li class="nav-item mb-2">
+                                <a class="nav-link" href="#" onclick="showSection('tasks')">
+                                    <i class="fas fa-tasks me-2"></i>Tareas
+                                    <span class="badge bg-danger ms-auto" id="tasks-count">0</span>
+                                </a>
+                            </li>
+                            <li class="nav-item mb-2">
+                                <a class="nav-link" href="#" onclick="showSection('reports')">
+                                    <i class="fas fa-chart-bar me-2"></i>Reportes
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="col-md-10">
+                <div id="content-area">
+                    <!-- Dashboard Section -->
+                    <div id="dashboard-section" class="content-section">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h2>
+                            <button class="btn btn-primary" onclick="refreshDashboard()">
+                                <i class="fas fa-sync-alt me-2"></i>Actualizar
+                            </button>
+                        </div>
+
+                        <!-- Stats Cards -->
+                        <div class="row mb-4" id="stats-cards">
+                            <div class="col-md-3 mb-3">
+                                <div class="card stats-card">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="stats-icon bg-primary me-3">
+                                                <i class="fas fa-user-plus"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="card-title mb-0" id="total-leads">0</h5>
+                                                <p class="card-text text-muted">Total Leads</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card stats-card">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="stats-icon bg-success me-3">
+                                                <i class="fas fa-users"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="card-title mb-0" id="total-clients">0</h5>
+                                                <p class="card-text text-muted">Clientes Activos</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card stats-card">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="stats-icon bg-warning me-3">
+                                                <i class="fas fa-file-invoice-dollar"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="card-title mb-0" id="total-quotations">0</h5>
+                                                <p class="card-text text-muted">Cotizaciones</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card stats-card">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="stats-icon bg-info me-3">
+                                                <i class="fas fa-percentage"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="card-title mb-0" id="conversion-rate">0%</h5>
+                                                <p class="card-text text-muted">Tasa Conversión</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts -->
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Leads por Estado</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="leadsStatusChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Leads por Fuente</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="leadsSourceChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Leads Section -->
+                    <div id="leads-section" class="content-section d-none">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2><i class="fas fa-user-plus me-2"></i>Gestión de Leads</h2>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#leadModal">
+                                <i class="fas fa-plus me-2"></i>Nuevo Lead
+                            </button>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Estado</label>
+                                        <select class="form-select" id="filter-status" onchange="filterLeads()">
+                                            <option value="">Todos los estados</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Fuente</label>
+                                        <select class="form-select" id="filter-source" onchange="filterLeads()">
+                                            <option value="">Todas las fuentes</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Buscar</label>
+                                        <input type="text" class="form-control" id="search-leads" placeholder="Nombre, empresa, email..." onkeyup="filterLeads()">
+                                    </div>
+                                    <div class="col-md-3 d-flex align-items-end">
+                                        <button class="btn btn-outline-secondary" onclick="clearFilters()">
+                                            <i class="fas fa-times me-2"></i>Limpiar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Leads Table -->
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Código</th>
+                                                <th>Nombre</th>
+                                                <th>Empresa</th>
+                                                <th>Email</th>
+                                                <th>Fuente</th>
+                                                <th>Estado</th>
+                                                <th>Score</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="leads-table-body">
+                                            <tr>
+                                                <td colspan="8" class="text-center">
+                                                    <div class="spinner-border text-primary" role="status">
+                                                        <span class="visually-hidden">Cargando...</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <!-- Pagination -->
+                                <nav aria-label="Paginación de leads">
+                                    <ul class="pagination justify-content-center" id="leads-pagination">
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clients Section -->
+                    <div id="clients-section" class="content-section d-none">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2><i class="fas fa-users me-2"></i>Gestión de Clientes</h2>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#clientModal">
+                                <i class="fas fa-plus me-2"></i>Nuevo Cliente
+                            </button>
+                        </div>
+
+                        <!-- Clients content will be loaded here -->
+                        <div id="clients-content">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Cargando clientes...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Other sections will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lead Modal -->
+    <div class="modal fade" id="leadModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2"></i>Nuevo Lead
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="leadForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nombre *</label>
+                                <input type="text" class="form-control" name="firstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Apellido *</label>
+                                <input type="text" class="form-control" name="lastName" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Empresa</label>
+                                <input type="text" class="form-control" name="companyName">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Teléfono</label>
+                                <input type="tel" class="form-control" name="phone">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fuente *</label>
+                                <select class="form-select" name="sourceId" required>
+                                    <option value="">Seleccionar fuente</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Estado</label>
+                                <select class="form-select" name="statusId">
+                                    <option value="">Seleccionar estado</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Valor Estimado</label>
+                                <input type="number" class="form-control" name="estimatedValue" step="0.01">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notas</label>
+                            <textarea class="form-control" name="notes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveLead()">
+                        <span class="loading spinner-border spinner-border-sm me-2" role="status"></span>
+                        Guardar Lead
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>

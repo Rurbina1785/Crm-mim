@@ -1,0 +1,108 @@
+@model IEnumerable<CRMSystem.API.Models.Prospecto>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Empresa</th>
+                <th>Contacto</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Estado</th>
+                <th>Valor Estimado</th>
+                <th>Prioridad</th>
+                <th>Vendedor</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var prospecto in Model)
+                {
+                    <tr>
+                        <td><strong>@prospecto.CodigoProspecto</strong></td>
+                        <td>@prospecto.NombreEmpresa</td>
+                        <td>@prospecto.ContactoCompleto</td>
+                        <td>@prospecto.Email</td>
+                        <td>@prospecto.Telefono</td>
+                        <td>
+                            @{
+                                var badgeClass = prospecto.EstadoProspecto switch
+                                {
+                                    "Nuevo" => "bg-info",
+                                    "Contactado" => "bg-primary",
+                                    "Calificado" => "bg-success",
+                                    "Propuesta" => "bg-warning",
+                                    "Negociación" => "bg-warning",
+                                    "Ganado" => "bg-success",
+                                    "Perdido" => "bg-danger",
+                                    _ => "bg-secondary"
+                                };
+                            }
+                            <span class="badge @badgeClass">@prospecto.EstadoProspecto</span>
+                        </td>
+                        <td>@prospecto.ValorEstimado?.ToString("C", new System.Globalization.CultureInfo("es-MX"))</td>
+                        <td>
+                            @{
+                                var prioridadBadge = prospecto.Prioridad switch
+                                {
+                                    "Alta" => "bg-danger",
+                                    "Media" => "bg-warning",
+                                    "Baja" => "bg-secondary",
+                                    _ => "bg-secondary"
+                                };
+                            }
+                            <span class="badge @prioridadBadge">@prospecto.Prioridad</span>
+                        </td>
+                        <td>@prospecto.VendedorAsignado?.NombreCompleto</td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" 
+                                        class="btn btn-outline-primary"
+                                        hx-get="/api/prospectos/@prospecto.Id"
+                                        hx-target="#modal-content"
+                                        hx-swap="innerHTML"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#detailModal"
+                                        title="Ver detalles">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button type="button" 
+                                        class="btn btn-outline-success"
+                                        hx-get="/api/prospectos/@prospecto.Id/editar"
+                                        hx-target="#modal-content"
+                                        hx-swap="innerHTML"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editModal"
+                                        title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" 
+                                        class="btn btn-outline-danger"
+                                        hx-delete="/api/prospectos/@prospecto.Id"
+                                        hx-confirm="¿Está seguro de eliminar este prospecto?"
+                                        hx-target="#prospectos-list"
+                                        hx-swap="outerHTML"
+                                        title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="10" class="text-center text-muted py-4">
+                        <i class="fas fa-inbox fa-3x mb-3"></i>
+                        <p>No hay prospectos registrados</p>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

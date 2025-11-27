@@ -1,0 +1,115 @@
+@model IEnumerable<CRMSystem.API.Models.Cliente>
+
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var cliente in Model)
+        {
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            <i class="fas fa-building me-2"></i>
+                            @cliente.NombreEmpresa
+                        </h6>
+                        <span class="badge @(cliente.EstadoCliente == "Activo" ? "bg-success" : "bg-secondary")">
+                            @(cliente.EstadoCliente)
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2">
+                            <strong>Código:</strong> @cliente.CodigoCliente
+                        </p>
+                        @if (!string.IsNullOrEmpty(cliente.RFC))
+                        {
+                            <p class="mb-2">
+                                <strong>RFC:</strong> @cliente.RFC
+                            </p>
+                        }
+                        @if (!string.IsNullOrEmpty(cliente.Industria))
+                        {
+                            <p class="mb-2">
+                                <strong>Industria:</strong> @cliente.Industria
+                            </p>
+                        }
+                        <p class="mb-2">
+                            <strong>Categoría:</strong> 
+                            <span class="badge bg-primary">@cliente.Categoria?.NombreCategoria</span>
+                        </p>
+                        @if (!string.IsNullOrEmpty(cliente.Email))
+                        {
+                            <p class="mb-2">
+                                <i class="fas fa-envelope me-2"></i>
+                                <a href="mailto:@cliente.Email">@cliente.Email</a>
+                            </p>
+                        }
+                        @if (!string.IsNullOrEmpty(cliente.Telefono))
+                        {
+                            <p class="mb-2">
+                                <i class="fas fa-phone me-2"></i>
+                                @cliente.Telefono
+                            </p>
+                        }
+                        @if (cliente.VendedorAsignado != null)
+                        {
+                            <p class="mb-2">
+                                <i class="fas fa-user me-2"></i>
+                                <strong>Vendedor:</strong> @cliente.VendedorAsignado.NombreCompleto
+                            </p>
+                        }
+                        @if (cliente.ValorVidaCliente > 0)
+                        {
+                            <p class="mb-2">
+                                <strong>Valor de Vida:</strong> 
+                                <span class="text-success fw-bold">
+                                    @cliente.ValorVidaCliente.ToString("C", new System.Globalization.CultureInfo("es-MX"))
+                                </span>
+                            </p>
+                        }
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="d-flex justify-content-between">
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-primary"
+                                    hx-get="/api/clientes/@cliente.Id"
+                                    hx-target="#modal-content"
+                                    hx-swap="innerHTML"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#detailModal">
+                                <i class="fas fa-eye me-1"></i> Ver
+                            </button>
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-success"
+                                    hx-get="/api/clientes/@cliente.Id/editar"
+                                    hx-target="#modal-content"
+                                    hx-swap="innerHTML"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editModal">
+                                <i class="fas fa-edit me-1"></i> Editar
+                            </button>
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-info"
+                                    hx-get="/api/clientes/@cliente.Id/contactos"
+                                    hx-target="#modal-content"
+                                    hx-swap="innerHTML"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#contactsModal">
+                                <i class="fas fa-address-book me-1"></i> Contactos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle fa-3x mb-3"></i>
+                <p class="mb-0">No hay clientes registrados</p>
+            </div>
+        </div>
+    }
+</div>
+

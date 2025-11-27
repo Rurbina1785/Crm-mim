@@ -1,0 +1,173 @@
+@model IEnumerable<CRMSystem.API.Models.Cotizacion>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Número</th>
+                <th>Cliente/Prospecto</th>
+                <th>Fecha</th>
+                <th>Vencimiento</th>
+                <th>Estado</th>
+                <th>Subtotal</th>
+                <th>IVA</th>
+                <th>Total</th>
+                <th>Vendedor</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var cotizacion in Model)
+                {
+                    <tr>
+                        <td><strong>@cotizacion.NumeroCotizacion</strong></td>
+                        <td>
+                            @cotizacion.NombreCliente
+                            @if (cotizacion.Cliente != null)
+                            {
+                                <br><small class="text-muted"><i class="fas fa-building"></i> Cliente</small>
+                            }
+                            else if (cotizacion.Prospecto != null)
+                            {
+                                <br><small class="text-muted"><i class="fas fa-user-plus"></i> Prospecto</small>
+                            }
+                        </td>
+                        <td>@cotizacion.FechaCotizacion.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @{
+                                var diasRestantes = (cotizacion.FechaVencimiento - DateTime.Now).Days;
+                                var vencimientoClass = diasRestantes < 0 ? "text-danger" : diasRestantes < 7 ? "text-warning" : "text-muted";
+                            }
+                            <span class="@vencimientoClass">
+                                @cotizacion.FechaVencimiento.ToString("dd/MM/yyyy")
+                                @if (diasRestantes < 0)
+                                {
+                                    <br><small>(Vencida)</small>
+                                }
+                                else if (diasRestantes < 7)
+                                {
+                                    <br><small>(@diasRestantes días)</small>
+                                }
+                            </span>
+                        </td>
+                        <td>
+                            @{
+                                var estadoBadge = cotizacion.EstadoCotizacion switch
+                                {
+                                    "Borrador" => "bg-secondary",
+                                    "Enviada" => "bg-primary",
+                                    "Aprobada" => "bg-success",
+                                    "Rechazada" => "bg-danger",
+                                    "Vencida" => "bg-warning",
+                                    _ => "bg-secondary"
+                                };
+                            }
+                            <span class="badge @estadoBadge">@cotizacion.EstadoCotizacion</span>
+                        </td>
+                        <td>@cotizacion.Subtotal.ToString("C", new System.Globalization.CultureInfo("es-MX"))</td>
+                        <td>@cotizacion.MontoIVA.ToString("C", new System.Globalization.CultureInfo("es-MX"))</td>
+                        <td><strong>@cotizacion.Total.ToString("C", new System.Globalization.CultureInfo("es-MX"))</strong></td>
+                        <td>@cotizacion.Vendedor?.NombreCompleto</td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" 
+                                        class="btn btn-outline-primary"
+                                        hx-get="/api/cotizaciones/@cotizacion.Id"
+                                        hx-target="#modal-content"
+                                        hx-swap="innerHTML"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#detailModal"
+                                        title="Ver detalles">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                @if (cotizacion.EstadoCotizacion == "Borrador" || cotizacion.EstadoCotizacion == "Enviada")
+                                {
+                                    <button type="button" 
+                                            class="btn btn-outline-success"
+                                            hx-get="/api/cotizaciones/@cotizacion.Id/editar"
+                                            hx-target="#modal-content"
+                                            hx-swap="innerHTML"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editModal"
+                                            title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                }
+                                <button type="button" 
+                                        class="btn btn-outline-info"
+                                        hx-get="/api/cotizaciones/@cotizacion.Id/pdf"
+                                        hx-target="_blank"
+                                        title="Descargar PDF">
+                                    <i class="fas fa-file-pdf"></i>
+                                </button>
+                                @if (cotizacion.EstadoCotizacion == "Borrador")
+                                {
+                                    <button type="button" 
+                                            class="btn btn-outline-danger"
+                                            hx-delete="/api/cotizaciones/@cotizacion.Id"
+                                            hx-confirm="¿Está seguro de eliminar esta cotización?"
+                                            hx-target="#cotizaciones-list"
+                                            hx-swap="outerHTML"
+                                            title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="10" class="text-center text-muted py-4">
+                        <i class="fas fa-file-invoice fa-3x mb-3"></i>
+                        <p>No hay cotizaciones registradas</p>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Resumen de Cotizaciones -->
+@if (Model != null && Model.Any())
+{
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total Cotizaciones</h6>
+                    <h3>@Model.Count()</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h6>Aprobadas</h6>
+                    <h3>@Model.Count(c => c.EstadoCotizacion == "Aprobada")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h6>Pendientes</h6>
+                    <h3>@Model.Count(c => c.EstadoCotizacion == "Enviada")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h6>Valor Total</h6>
+                    <h3>@Model.Sum(c => c.Total).ToString("C0", new System.Globalization.CultureInfo("es-MX"))</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

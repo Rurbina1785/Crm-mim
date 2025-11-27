@@ -1,0 +1,346 @@
+@model dynamic
+
+<div class="row mb-4">
+    <!-- Total Prospectos -->
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Total Prospectos</h6>
+                        <h2 class="mb-0">@ViewBag.TotalProspectos</h2>
+                        <small class="text-success">
+                            <i class="fas fa-arrow-up"></i> +@ViewBag.ProspectosNuevos nuevos
+                        </small>
+                    </div>
+                    <div class="stats-icon bg-warning">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Clientes -->
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Total Clientes</h6>
+                        <h2 class="mb-0">@ViewBag.TotalClientes</h2>
+                        <small class="text-success">
+                            <i class="fas fa-arrow-up"></i> +@ViewBag.ClientesNuevos este mes
+                        </small>
+                    </div>
+                    <div class="stats-icon bg-success">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Cotizaciones -->
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Cotizaciones</h6>
+                        <h2 class="mb-0">@ViewBag.TotalCotizaciones</h2>
+                        <small class="text-info">
+                            <i class="fas fa-clock"></i> @ViewBag.CotizacionesPendientes pendientes
+                        </small>
+                    </div>
+                    <div class="stats-icon bg-info">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ventas del Mes -->
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Ventas del Mes</h6>
+                        <h2 class="mb-0">@ViewBag.VentasMes</h2>
+                        <small class="text-success">
+                            <i class="fas fa-arrow-up"></i> @ViewBag.CrecimientoVentas%
+                        </small>
+                    </div>
+                    <div class="stats-icon bg-primary">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficas del Dashboard -->
+<div class="row mb-4">
+    <!-- Embudo de Ventas -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-filter me-2"></i>
+                    Embudo de Ventas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="salesFunnelChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Distribución por Sucursal -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Distribución por Sucursal
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="branchDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ventas Mensuales -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Ventas Mensuales
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="monthlySalesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Actividad Reciente -->
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>
+                    Actividad Reciente
+                </h5>
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                <div class="list-group list-group-flush">
+                    @if (ViewBag.ActividadReciente != null)
+                    {
+                        @foreach (var actividad in ViewBag.ActividadReciente)
+                        {
+                            <div class="list-group-item border-0 px-0">
+                                <div class="d-flex align-items-start">
+                                    <div class="me-3">
+                                        <i class="fas fa-circle text-primary" style="font-size: 0.5rem;"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <p class="mb-1">@actividad.Descripcion</p>
+                                        <small class="text-muted">@actividad.Fecha</small>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4">No hay actividad reciente</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tareas Pendientes -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-tasks me-2"></i>
+                    Tareas Pendientes
+                </h5>
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                <div class="list-group list-group-flush">
+                    @if (ViewBag.TareasPendientes != null)
+                    {
+                        @foreach (var tarea in ViewBag.TareasPendientes)
+                        {
+                            <div class="list-group-item border-0 px-0">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">@tarea.Titulo</h6>
+                                        <p class="mb-1 text-muted small">@tarea.DescripcionTarea</p>
+                                        <small class="text-danger">
+                                            <i class="fas fa-clock me-1"></i>
+                                            Vence: @tarea.FechaVencimiento.ToString("dd/MM/yyyy")
+                                        </small>
+                                    </div>
+                                    <span class="badge bg-@(tarea.Prioridad == "Alta" ? "danger" : tarea.Prioridad == "Media" ? "warning" : "secondary")">
+                                        @tarea.Prioridad
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4">No hay tareas pendientes</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Inicializar gráficas del dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        // Embudo de Ventas
+        const funnelCtx = document.getElementById('salesFunnelChart');
+        if (funnelCtx) {
+            new Chart(funnelCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Nuevo', 'Contactado', 'Calificado', 'Propuesta', 'Negociación', 'Ganado'],
+                    datasets: [{
+                        label: 'Prospectos',
+                        data: @Html.Raw(ViewBag.FunnelData ?? "[0,0,0,0,0,0]"),
+                        backgroundColor: [
+                            'rgba(13, 202, 240, 0.7)',
+                            'rgba(13, 110, 253, 0.7)',
+                            'rgba(25, 135, 84, 0.7)',
+                            'rgba(255, 193, 7, 0.7)',
+                            'rgba(255, 193, 7, 0.7)',
+                            'rgba(25, 135, 84, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(13, 202, 240, 1)',
+                            'rgba(13, 110, 253, 1)',
+                            'rgba(25, 135, 84, 1)',
+                            'rgba(255, 193, 7, 1)',
+                            'rgba(255, 193, 7, 1)',
+                            'rgba(25, 135, 84, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Distribución por Sucursal
+        const branchCtx = document.getElementById('branchDistributionChart');
+        if (branchCtx) {
+            new Chart(branchCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: @Html.Raw(ViewBag.SucursalesLabels ?? "['Norte', 'Centro', 'Sur']"),
+                    datasets: [{
+                        data: @Html.Raw(ViewBag.SucursalesData ?? "[0,0,0]"),
+                        backgroundColor: [
+                            'rgba(13, 110, 253, 0.7)',
+                            'rgba(25, 135, 84, 0.7)',
+                            'rgba(255, 193, 7, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(13, 110, 253, 1)',
+                            'rgba(25, 135, 84, 1)',
+                            'rgba(255, 193, 7, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Ventas Mensuales
+        const salesCtx = document.getElementById('monthlySalesChart');
+        if (salesCtx) {
+            new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    datasets: [{
+                        label: 'Ventas 2024',
+                        data: @Html.Raw(ViewBag.VentasMensuales ?? "[0,0,0,0,0,0,0,0,0,0,0,0]"),
+                        borderColor: 'rgba(13, 110, 253, 1)',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString('es-MX');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+}
+
