@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CRMSystem.API.Data;
 using CRMSystem.API.Models;
+using System.Text.RegularExpressions;
 
 namespace CRMSystem.API.Controllers
 {
@@ -126,18 +127,34 @@ namespace CRMSystem.API.Controllers
         /// <summary>
         /// Crea un nuevo prospecto en el sistema
         /// </summary>
-        /// <param name="prospecto">Datos del nuevo prospecto</param>
+        /// <param name="dto">Datos del nuevo prospecto</param>
         /// <returns>Prospecto creado con código generado automáticamente</returns>
         [HttpPost]
-        public async Task<IActionResult> CrearProspecto([FromBody] Prospecto prospecto)
+        public async Task<IActionResult> CrearProspecto([FromBody] CrearProspectoDto dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            // Validar que existan las entidades relacionadas
+            var fuente = await _context.FuentesProspecto.FindAsync(dto.FuenteId);
+            if (fuente == null)
+                return BadRequest(new { error = "La fuente especificada no existe" });
+
+            var sucursal = await _context.Sucursales.FindAsync(dto.SucursalId);
+            if (sucursal == null)
+                return BadRequest(new { error = "La sucursal especificada no existe" });
+
+            if (dto.VendedorAsignadoId.HasValue)
+            {
+                var vendedor = await _context.Usuarios.FindAsync(dto.VendedorAsignadoId.Value);
+                if (vendedor == null)
+                    return BadRequest(new { error = "El vendedor especificado no existe" });
+            }
+
             // Generar código de prospecto automáticamente
-            var año = DateTime.Now.Year;
+            var año = DateTime.UtcNow.Year;
             var ultimoProspecto = await _context.Prospectos
                 .Where(p => p.CodigoProspecto.StartsWith($"PROS-{año}-"))
                 .OrderByDescending(p => p.CodigoProspecto)
@@ -153,12 +170,43 @@ namespace CRMSystem.API.Controllers
                 }
             }
 
-            prospecto.CodigoProspecto = $"PROS-{año}-{siguienteNumero:D3}";
-            prospecto.FechaCreacion = DateTime.Now;
-            prospecto.FechaActualizacion = DateTime.Now;
+            // Crear el prospecto desde el DTO
+            var prospecto = new Prospecto
+            {
+                CodigoProspecto = $"PROS-{año}-{siguienteNumero:D3}",
+                NombreEmpresa = dto.NombreEmpresa,
+                NombreContacto = dto.NombreContacto,
+                ApellidoContacto = dto.ApellidoContacto,
+                Email = dto.Email,
+                Telefono = dto.Telefono,
+                FuenteId = dto.FuenteId,
+                SucursalId = dto.SucursalId,
+                VendedorAsignadoId = dto.VendedorAsignadoId,
+                EstadoProspecto = dto.EstadoProspecto,
+                Prioridad = dto.Prioridad,
+                ValorEstimado = dto.ValorEstimado ?? 0,
+                ProbabilidadCierre = dto.ProbabilidadCierre ?? 50,
+                Notas = dto.Notas,
+                FechaCreacion = DateTime.UtcNow,
+                FechaActualizacion = DateTime.UtcNow
+            };
 
             _context.Prospectos.Add(prospecto);
             await _context.SaveChangesAsync();
+
+            // Cargar las relaciones para la respuesta
+            await _context.Entry(prospecto)
+                .Reference(p => p.Fuente)
+                .LoadAsync();
+            await _context.Entry(prospecto)
+                .Reference(p => p.Sucursal)
+                .LoadAsync();
+            if (prospecto.VendedorAsignadoId.HasValue)
+            {
+                await _context.Entry(prospecto)
+                    .Reference(p => p.VendedorAsignado)
+                    .LoadAsync();
+            }
 
             // Si la petición es HTMX, devolver lista actualizada
             if (Request.Headers["HX-Request"] == "true")
@@ -171,7 +219,7 @@ namespace CRMSystem.API.Controllers
                     .Take(50)
                     .ToListAsync();
 
-                Response.Headers.Add("X-Success-Message", "Prospecto creado exitosamente");
+                Response.Headers.Append("X-Success-Message", "Prospecto creado exitosamente");
                 return PartialView("~/Pages/Partials/_ProspectosList.cshtml", prospectos);
             }
 

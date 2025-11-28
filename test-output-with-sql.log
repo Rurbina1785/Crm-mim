@@ -1,0 +1,279 @@
+[H[2J[3J[1m[0;36m╔═══════════════════════════════════════════════════════════════╗[0m
+[1m[0;36m║  PRUEBAS API CRM CON PRECONDICIONES/POSTCONDICIONES SQL      ║[0m
+[1m[0;36m╚═══════════════════════════════════════════════════════════════╝[0m
+
+
+[1m[0;36m═══════════════════════════════════════════════════════════════[0m
+[1m[1;37mTEST #1: Listar todos los prospectos[0m
+[1m[0;36m═══════════════════════════════════════════════════════════════[0m
+
+[0;36m📊 PRECONDICIÓN SQL:[0m
+[1;33mSELECT "Id", "CodigoProspecto", "NombreEmpresa", "EstadoProspecto" FROM "Prospectos" ORDER BY "Id";[0m
+ Id | CodigoProspecto |        NombreEmpresa         | EstadoProspecto 
+----+-----------------+------------------------------+-----------------
+  1 | PROS-2024-001   | Tecnología Avanzada SA       | Nuevo
+  2 | PROS-2024-002   | Soluciones Empresariales MX  | Nuevo
+  3 | PROS-2024-003   | Grupo Industrial del Sureste | Nuevo
+  4 | PROS-2025-001   | Test Company API             | Nuevo
+  5 | PROS-2025-002   | Test Company Enhanced        | Nuevo
+(5 rows)
+
+
+[0;36m🌐 LLAMADA API:[0m
+[1;37mGET http://localhost:5000/api/Prospectos[0m
+[1;37mHTTP Status: 200[0m
+[1;37mResponse:[0m
+[
+  {
+    "id": 5,
+    "codigoProspecto": "PROS-2025-002",
+    "nombreEmpresa": "Test Company Enhanced",
+    "nombreContacto": "Carlos",
+    "apellidoContacto": "Test",
+    "email": "carlos.test@enhanced.com",
+    "telefono": "+52-55-9999-8888",
+    "pais": "México",
+    "fuenteId": 2,
+    "estadoProspecto": "Nuevo",
+    "prioridad": "Media",
+    "valorEstimado": 75000,
+    "probabilidadCierre": 70,
+    "vendedorAsignadoId": 2,
+    "sucursalId": 2,
+    "fechaCreacion": "2025-11-28T21:32:34.319169Z",
+    "fechaActualizacion": "2025-11-28T21:32:34.319169Z",
+    "fuente": {
+
+[0;36m📊 POSTCONDICIÓN SQL:[0m
+[1;33mSELECT COUNT(*) as total_prospectos FROM "Prospectos";[0m
+ total_prospectos 
+------------------
+                5
+(1 row)
+
+
+[0;32m✓ EXITOSO[0m - Listar todos los prospectos
+
+[1m[0;36m═══════════════════════════════════════════════════════════════[0m
+[1m[1;37mTEST #2: Obtener prospecto por ID[0m
+[1m[0;36m═══════════════════════════════════════════════════════════════[0m
+
+[0;36m📊 PRECONDICIÓN SQL:[0m
+[1;33mSELECT "Id", "CodigoProspecto", "NombreEmpresa", "Email" FROM "Prospectos" WHERE "Id" = 1;[0m
+ Id | CodigoProspecto |     NombreEmpresa      |          Email           
+----+-----------------+------------------------+--------------------------
+  1 | PROS-2024-001   | Tecnología Avanzada SA | cramirez@tecavanzada.com
+(1 row)
+
+
+[0;36m🌐 LLAMADA API:[0m
+[1;37mGET http://localhost:5000/api/Prospectos/1[0m
+[1;37mHTTP Status: 200[0m
+[1;37mResponse:[0m
+{
+  "id": 1,
+  "codigoProspecto": "PROS-2024-001",
+  "nombreEmpresa": "Tecnología Avanzada SA",
+  "nombreContacto": "Carlos",
+  "apellidoContacto": "Ramírez",
+  "email": "cramirez@tecavanzada.com",
+  "telefono": "+52-81-5555-1234",
+  "pais": "México",
+  "fuenteId": 1,
+  "estadoProspecto": "Nuevo",
+  "prioridad": "Media",
+  "valorEstimado": 150000,
+  "probabilidadCierre": 0,
+  "vendedorAsignadoId": 1,
+  "sucursalId": 1,
+  "fechaCreacion": "2025-11-27T20:10:35.206576Z",
+  "fechaActualizacion": "2025-11-27T20:10:35.206576Z",
+  "fuente": {
+    "id": 1,
+
+[0;36m📊 POSTCONDICIÓN SQL:[0m
+[1;33mSELECT "FechaActualizacion" FROM "Prospectos" WHERE "Id" = 1;[0m
+      FechaActualizacion       
+-------------------------------
+ 2025-11-27 15:10:35.206576-05
+(1 row)
+
+
+[0;32m✓ EXITOSO[0m - Obtener prospecto por ID
+
+[1m[0;36m═══════════════════════════════════════════════════════════════[0m
+[1m[1;37mTEST #3: Crear nuevo prospecto[0m
+[1m[0;36m═══════════════════════════════════════════════════════════════[0m
+
+[0;36m📊 PRECONDICIÓN SQL:[0m
+[1;33mSELECT COUNT(*) as total_antes, MAX("Id") as ultimo_id FROM "Prospectos";[0m
+ total_antes | ultimo_id 
+-------------+-----------
+           5 |         5
+(1 row)
+
+
+[0;36m🌐 LLAMADA API:[0m
+[1;37mPOST http://localhost:5000/api/Prospectos[0m
+[1;33mPayload:[0m
+{
+  "nombreEmpresa": "Test Visual Script",
+  "nombreContacto": "Pedro",
+  "apellidoContacto": "Visual",
+  "email": "pedro.visual@test.com",
+  "telefono": "+52-55-7777-6666",
+  "fuenteId": 3,
+  "sucursalId": 3,
+  "vendedorAsignadoId": 1,
+  "estadoProspecto": "Nuevo",
+  "prioridad": "Alta",
+  "valorEstimado": 100000,
+  "probabilidadCierre": 80
+}
+[1;37mHTTP Status: 201[0m
+[1;37mResponse:[0m
+{
+  "id": 6,
+  "codigoProspecto": "PROS-2025-003",
+  "nombreEmpresa": "Test Visual Script",
+  "nombreContacto": "Pedro",
+  "apellidoContacto": "Visual",
+  "email": "pedro.visual@test.com",
+  "telefono": "+52-55-7777-6666",
+  "pais": "México",
+  "fuenteId": 3,
+  "estadoProspecto": "Nuevo",
+  "prioridad": "Alta",
+  "valorEstimado": 100000,
+  "probabilidadCierre": 80,
+  "vendedorAsignadoId": 1,
+  "sucursalId": 3,
+  "fechaCreacion": "2025-11-28T21:33:24.6318128Z",
+  "fechaActualizacion": "2025-11-28T21:33:24.6318129Z",
+  "fuente": {
+    "id": 3,
+
+[0;36m📊 POSTCONDICIÓN SQL:[0m
+[1;33mSELECT "Id", "CodigoProspecto", "NombreEmpresa", "ValorEstimado" FROM "Prospectos" ORDER BY "Id" DESC LIMIT 1;[0m
+ Id | CodigoProspecto |   NombreEmpresa    | ValorEstimado 
+----+-----------------+--------------------+---------------
+  6 | PROS-2025-003   | Test Visual Script |     100000.00
+(1 row)
+
+
+[0;32m✓ EXITOSO[0m - Crear nuevo prospecto
+
+[1m[0;36m═══════════════════════════════════════════════════════════════[0m
+[1m[1;37mTEST #4: Listar fuentes de prospectos[0m
+[1m[0;36m═══════════════════════════════════════════════════════════════[0m
+
+[0;36m📊 PRECONDICIÓN SQL:[0m
+[1;33mSELECT "Id", "NombreFuente" FROM "FuentesProspecto" ORDER BY "Id";[0m
+ Id |     NombreFuente     
+----+----------------------
+  1 | Expo Industrial 2024
+  2 | Campaña Digital Q1
+  3 | Referido Cliente
+  4 | Sitio Web
+  5 | Llamada Fría
+  6 | LinkedIn
+  7 | Evento Networking
+(7 rows)
+
+
+[0;36m🌐 LLAMADA API:[0m
+[1;37mGET http://localhost:5000/api/Prospectos/fuentes[0m
+[1;37mHTTP Status: 200[0m
+[1;37mResponse:[0m
+[
+  {
+    "id": 1,
+    "nombreFuente": "Expo Industrial 2024",
+    "descripcion": "Exposición industrial anual",
+    "tipoFuente": "Expo",
+    "fechaCreacion": "2025-11-27T20:10:35.206553Z",
+    "prospectos": []
+  },
+  {
+    "id": 2,
+    "nombreFuente": "Campaña Digital Q1",
+    "descripcion": "Campaña de marketing digital primer trimestre",
+    "tipoFuente": "Campaña",
+    "fechaCreacion": "2025-11-27T20:10:35.206553Z",
+    "prospectos": []
+  },
+  {
+    "id": 3,
+    "nombreFuente": "Referido Cliente",
+
+[0;36m📊 POSTCONDICIÓN SQL:[0m
+[1;33mSELECT COUNT(*) as total_fuentes FROM "FuentesProspecto";[0m
+ total_fuentes 
+---------------
+             7
+(1 row)
+
+
+[0;32m✓ EXITOSO[0m - Listar fuentes de prospectos
+
+[1m[0;36m═══════════════════════════════════════════════════════════════[0m
+[1m[1;37mTEST #5: Listar categorías de clientes[0m
+[1m[0;36m═══════════════════════════════════════════════════════════════[0m
+
+[0;36m📊 PRECONDICIÓN SQL:[0m
+[1;33mSELECT "Id", "NombreCategoria", "PorcentajeDescuento" FROM "CategoriasCliente" ORDER BY "PorcentajeDescuento" DESC;[0m
+ Id | NombreCategoria | PorcentajeDescuento 
+----+-----------------+---------------------
+  1 | Premium         |               20.00
+  2 | Corporativo     |               15.00
+  3 | Regular         |               10.00
+  4 | Nuevo           |                5.00
+(4 rows)
+
+
+[0;36m🌐 LLAMADA API:[0m
+[1;37mGET http://localhost:5000/api/Clientes/categorias[0m
+[1;37mHTTP Status: 200[0m
+[1;37mResponse:[0m
+[
+  {
+    "id": 1,
+    "nombreCategoria": "Premium",
+    "porcentajeDescuento": 20,
+    "descripcion": "Clientes premium con descuento máximo",
+    "fechaCreacion": "2025-11-27T20:10:35.206546Z",
+    "clientes": []
+  },
+  {
+    "id": 2,
+    "nombreCategoria": "Corporativo",
+    "porcentajeDescuento": 15,
+    "descripcion": "Clientes corporativos con descuento medio",
+    "fechaCreacion": "2025-11-27T20:10:35.206547Z",
+    "clientes": []
+  },
+  {
+    "id": 3,
+    "nombreCategoria": "Regular",
+
+[0;36m📊 POSTCONDICIÓN SQL:[0m
+[1;33mSELECT COUNT(*) as total_categorias FROM "CategoriasCliente";[0m
+ total_categorias 
+------------------
+                4
+(1 row)
+
+
+[0;32m✓ EXITOSO[0m - Listar categorías de clientes
+
+[1m[0;36m╔═══════════════════════════════════════════════════════════════╗[0m
+[1m[0;36m║  REPORTE FINAL                                                ║[0m
+[1m[0;36m╚═══════════════════════════════════════════════════════════════╝[0m
+
+[1;37mTotal de pruebas:[0m     5
+[0;32mPruebas exitosas:[0m     5
+[0;31mPruebas fallidas:[0m     0
+[0;36mTasa de éxito:[0m        100%
+
+[0;32m[1m✓ TODAS LAS PRUEBAS EXITOSAS[0m
+

@@ -31,8 +31,8 @@ async function loadDashboard() {
     try {
         // Load statistics
         const [leadsStats, clientsStats] = await Promise.all([
-            fetch(`${API_BASE}/leads/statistics`).then(r => r.json()),
-            fetch(`${API_BASE}/clients/statistics`).then(r => r.json())
+            fetch(`${API_BASE}/Prospectos/statistics`).then(r => r.json()),
+            fetch(`${API_BASE}/Clientes/statistics`).then(r => r.json())
         ]);
 
         // Update stats cards
@@ -179,7 +179,7 @@ async function loadLeads(page = 1) {
             ...currentFilters
         });
 
-        const response = await fetch(`${API_BASE}/leads?${params}`);
+        const response = await fetch(`${API_BASE}/Prospectos?${params}`);
         const leads = await response.json();
         
         // Get pagination info from headers
@@ -368,7 +368,7 @@ async function saveLead() {
     try {
         showLoading(true);
         
-        const response = await fetch(`${API_BASE}/leads`, {
+        const response = await fetch(`${API_BASE}/Prospectos`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
