@@ -1,0 +1,171 @@
+### Test GET Usuarios
+# Verificar que el endpoint GET /api/Usuarios devuelve la lista de usuarios
+# NOTA: Este endpoint requiere implementar UsuariosController
+
+pre_sql:
+SELECT "Id", "NombreUsuario", "Email", "RolId" FROM "Usuarios" ORDER BY "Id"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Usuarios' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_usuarios FROM "Usuarios"
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Usuario por ID
+# Verificar que se puede obtener un usuario especifico por su ID
+
+pre_sql:
+SELECT "Id", "NombreUsuario", "Email", "RolId" FROM "Usuarios" WHERE "Id" = 1
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Usuarios/1' -H 'accept: application/json'
+
+post_sql:
+SELECT "FechaActualizacion" FROM "Usuarios" WHERE "Id" = 1
+
+assert:
+status_code == 200 and json['id'] == 1
+
+---
+
+### Test GET Roles de Usuario
+# Verificar que se obtienen todos los roles disponibles
+
+pre_sql:
+SELECT "Id", "NombreRol" FROM "RolesUsuario" ORDER BY "Id"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Usuarios/roles' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_roles FROM "RolesUsuario"
+
+assert:
+status_code == 200 and len(json) == post_sql[0]['total_roles']
+
+---
+
+### Test POST Crear Usuario
+# Verificar que se puede crear un nuevo usuario
+
+pre_sql:
+SELECT COUNT(*) as total_antes FROM "Usuarios"
+
+curl:
+curl -X 'POST' 'http://localhost:5000/api/Usuarios' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"nombreUsuario":"usuario_test","email":"test@crm.com","contrasena":"Test123!","nombre":"Usuario","apellido":"Prueba","rolId":2,"sucursalId":1,"estaActivo":true}'
+
+post_sql:
+SELECT COUNT(*) as total_despues FROM "Usuarios"
+
+assert:
+status_code == 201 and post_sql[0]['total_despues'] == pre_sql[0]['total_antes'] + 1
+
+---
+
+### Test GET Usuarios por Rol
+# Verificar que se pueden filtrar usuarios por rol
+
+pre_sql:
+SELECT COUNT(*) as total FROM "Usuarios" WHERE "RolId" = 2
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Usuarios?rolId=2' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total FROM "Usuarios" WHERE "RolId" = 2
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Usuarios por Sucursal
+# Verificar que se pueden filtrar usuarios por sucursal
+
+pre_sql:
+SELECT COUNT(*) as total FROM "Usuarios" WHERE "SucursalId" = 1
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Usuarios?sucursalId=1' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total FROM "Usuarios" WHERE "SucursalId" = 1
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Usuarios Activos
+# Verificar que se pueden filtrar usuarios activos
+
+pre_sql:
+SELECT COUNT(*) as total_activos FROM "Usuarios" WHERE "EstaActivo" = true
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Usuarios?activo=true' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_activos FROM "Usuarios" WHERE "EstaActivo" = true
+
+assert:
+status_code == 200
+
+---
+
+### Test PUT Actualizar Usuario
+# Verificar que se puede actualizar un usuario existente
+
+pre_sql:
+SELECT "Nombre", "Apellido", "Email" FROM "Usuarios" WHERE "Id" = 1
+
+curl:
+curl -X 'PUT' 'http://localhost:5000/api/Usuarios/1' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"nombre":"Nombre Actualizado","apellido":"Apellido Actualizado"}'
+
+post_sql:
+SELECT "Nombre", "Apellido", "FechaActualizacion" FROM "Usuarios" WHERE "Id" = 1
+
+assert:
+status_code == 204
+
+---
+
+### Test DELETE Usuario
+# Verificar que se puede desactivar un usuario (soft delete)
+
+pre_sql:
+SELECT "EstaActivo" FROM "Usuarios" WHERE "Id" = 1
+
+curl:
+curl -X 'DELETE' 'http://localhost:5000/api/Usuarios/1' -H 'accept: application/json'
+
+post_sql:
+SELECT "EstaActivo" FROM "Usuarios" WHERE "Id" = 1
+
+assert:
+status_code == 204
+
+---
+
+### Test GET Sucursales
+# Verificar que se obtienen todas las sucursales
+
+pre_sql:
+SELECT "Id", "NombreSucursal", "Ciudad" FROM "Sucursales" ORDER BY "Id"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Usuarios/sucursales' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_sucursales FROM "Sucursales"
+
+assert:
+status_code == 200 and len(json) == post_sql[0]['total_sucursales']
+
+---
+

@@ -1,0 +1,258 @@
+### Test GET Visitas
+# Verificar que el endpoint GET /api/Visitas devuelve la lista de visitas
+# NOTA: Este endpoint requiere implementar VisitasController
+
+pre_sql:
+SELECT "Id", "ClienteId", "UsuarioId", "FechaVisita" FROM "Visitas" ORDER BY "FechaVisita" DESC
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Visitas' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_visitas FROM "Visitas"
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Visita por ID
+# Verificar que se puede obtener una visita especifica por su ID
+
+pre_sql:
+SELECT "Id", "ClienteId", "FechaVisita", "Proposito" FROM "Visitas" WHERE "Id" = 1
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Visitas/1' -H 'accept: application/json'
+
+post_sql:
+SELECT "FechaActualizacion" FROM "Visitas" WHERE "Id" = 1
+
+assert:
+status_code == 200 and json['id'] == 1
+
+---
+
+### Test POST Crear Visita
+# Verificar que se puede crear una nueva visita
+
+pre_sql:
+SELECT COUNT(*) as total_antes FROM "Visitas"
+
+curl:
+curl -X 'POST' 'http://localhost:5000/api/Visitas' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"clienteId":1,"usuarioId":1,"fechaVisita":"2025-12-15T10:00:00","proposito":"Presentacion de productos","notas":"Primera visita del mes","estadoVisita":"Programada"}'
+
+post_sql:
+SELECT COUNT(*) as total_despues FROM "Visitas"
+
+assert:
+status_code == 201 and post_sql[0]['total_despues'] == pre_sql[0]['total_antes'] + 1
+
+---
+
+### Test GET Visitas por Cliente
+# Verificar que se pueden filtrar visitas por cliente
+
+pre_sql:
+SELECT COUNT(*) as total FROM "Visitas" WHERE "ClienteId" = 1
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Visitas?clienteId=1' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total FROM "Visitas" WHERE "ClienteId" = 1
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Visitas por Usuario
+# Verificar que se pueden filtrar visitas por usuario (vendedor)
+
+pre_sql:
+SELECT COUNT(*) as total FROM "Visitas" WHERE "UsuarioId" = 1
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Visitas?usuarioId=1' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total FROM "Visitas" WHERE "UsuarioId" = 1
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Tareas
+# Verificar que el endpoint GET /api/Tareas devuelve la lista de tareas
+# NOTA: Este endpoint requiere implementar TareasController
+
+pre_sql:
+SELECT "Id", "UsuarioAsignadoId", "Titulo", "FechaVencimiento" FROM "Tareas" ORDER BY "FechaVencimiento"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Tareas' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_tareas FROM "Tareas"
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Tarea por ID
+# Verificar que se puede obtener una tarea especifica por su ID
+
+pre_sql:
+SELECT "Id", "Titulo", "Descripcion", "Prioridad" FROM "Tareas" WHERE "Id" = 1
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Tareas/1' -H 'accept: application/json'
+
+post_sql:
+SELECT "FechaActualizacion" FROM "Tareas" WHERE "Id" = 1
+
+assert:
+status_code == 200 and json['id'] == 1
+
+---
+
+### Test POST Crear Tarea
+# Verificar que se puede crear una nueva tarea
+
+pre_sql:
+SELECT COUNT(*) as total_antes FROM "Tareas"
+
+curl:
+curl -X 'POST' 'http://localhost:5000/api/Tareas' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"titulo":"Llamar a cliente","descripcion":"Seguimiento de cotizacion","usuarioAsignadoId":1,"fechaVencimiento":"2025-12-20T17:00:00","prioridad":"Alta","estadoTarea":"Pendiente"}'
+
+post_sql:
+SELECT COUNT(*) as total_despues FROM "Tareas"
+
+assert:
+status_code == 201 and post_sql[0]['total_despues'] == pre_sql[0]['total_antes'] + 1
+
+---
+
+### Test GET Tareas por Usuario
+# Verificar que se pueden filtrar tareas por usuario asignado
+
+pre_sql:
+SELECT COUNT(*) as total FROM "Tareas" WHERE "UsuarioAsignadoId" = 1
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Tareas?usuarioId=1' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total FROM "Tareas" WHERE "UsuarioAsignadoId" = 1
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Tareas por Estado
+# Verificar que se pueden filtrar tareas por estado
+
+pre_sql:
+SELECT COUNT(*) as total FROM "Tareas" WHERE "EstadoTarea" = 'Pendiente'
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Tareas?estado=Pendiente' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total FROM "Tareas" WHERE "EstadoTarea" = 'Pendiente'
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Eventos Calendario
+# Verificar que el endpoint GET /api/Eventos devuelve eventos del calendario
+# NOTA: Este endpoint requiere implementar EventosController
+
+pre_sql:
+SELECT "Id", "Titulo", "FechaInicio", "FechaFin" FROM "EventosCalendario" ORDER BY "FechaInicio"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Eventos' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_eventos FROM "EventosCalendario"
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Evento por ID
+# Verificar que se puede obtener un evento especifico por su ID
+
+pre_sql:
+SELECT "Id", "Titulo", "Descripcion", "TipoEvento" FROM "EventosCalendario" WHERE "Id" = 1
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Eventos/1' -H 'accept: application/json'
+
+post_sql:
+SELECT "FechaActualizacion" FROM "EventosCalendario" WHERE "Id" = 1
+
+assert:
+status_code == 200 and json['id'] == 1
+
+---
+
+### Test POST Crear Evento
+# Verificar que se puede crear un nuevo evento en el calendario
+
+pre_sql:
+SELECT COUNT(*) as total_antes FROM "EventosCalendario"
+
+curl:
+curl -X 'POST' 'http://localhost:5000/api/Eventos' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"titulo":"Reunion con cliente","descripcion":"Presentacion de propuesta","fechaInicio":"2025-12-18T14:00:00","fechaFin":"2025-12-18T15:30:00","tipoEvento":"Reunion","usuarioId":1,"clienteId":1}'
+
+post_sql:
+SELECT COUNT(*) as total_despues FROM "EventosCalendario"
+
+assert:
+status_code == 201 and post_sql[0]['total_despues'] == pre_sql[0]['total_antes'] + 1
+
+---
+
+### Test GET Eventos por Rango de Fechas
+# Verificar que se pueden filtrar eventos por rango de fechas
+
+pre_sql:
+SELECT COUNT(*) as total FROM "EventosCalendario" WHERE "FechaInicio" >= '2025-12-01' AND "FechaInicio" <= '2025-12-31'
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Eventos?fechaInicio=2025-12-01&fechaFin=2025-12-31' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total FROM "EventosCalendario" WHERE "FechaInicio" >= '2025-12-01' AND "FechaInicio" <= '2025-12-31'
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Eventos por Usuario
+# Verificar que se pueden filtrar eventos por usuario
+
+pre_sql:
+SELECT COUNT(*) as total FROM "EventosCalendario" WHERE "UsuarioId" = 1
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Eventos?usuarioId=1' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total FROM "EventosCalendario" WHERE "UsuarioId" = 1
+
+assert:
+status_code == 200
+
+---
+

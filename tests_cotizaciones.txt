@@ -1,0 +1,154 @@
+### Test GET Cotizaciones
+# Verificar que el endpoint GET /api/Cotizaciones devuelve la lista de cotizaciones
+# NOTA: Este endpoint requiere implementar CotizacionesController
+
+pre_sql:
+SELECT "Id", "CodigoCotizacion", "ClienteId", "Total" FROM "Cotizaciones" ORDER BY "Id"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Cotizaciones' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_cotizaciones FROM "Cotizaciones"
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Cotizacion por ID
+# Verificar que se puede obtener una cotizacion especifica con sus detalles
+
+pre_sql:
+SELECT "Id", "CodigoCotizacion", "ClienteId", "Total" FROM "Cotizaciones" WHERE "Id" = 1
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Cotizaciones/1' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as detalles FROM "DetallesCotizacion" WHERE "CotizacionId" = 1
+
+assert:
+status_code == 200 and json['id'] == 1
+
+---
+
+### Test POST Crear Cotizacion
+# Verificar que se puede crear una nueva cotizacion con detalles
+
+pre_sql:
+SELECT COUNT(*) as total_antes FROM "Cotizaciones"
+
+curl:
+curl -X 'POST' 'http://localhost:5000/api/Cotizaciones' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"clienteId":1,"prospectoId":null,"vendedorId":1,"fechaVigencia":"2025-12-31","condicionesPago":"30 dias","observaciones":"Cotizacion de prueba","detalles":[{"productoId":1,"cantidad":5,"precioUnitario":999.99,"descuento":10}]}'
+
+post_sql:
+SELECT COUNT(*) as total_despues FROM "Cotizaciones"
+
+assert:
+status_code == 201 and post_sql[0]['total_despues'] == pre_sql[0]['total_antes'] + 1
+
+---
+
+### Test GET Cotizaciones por Cliente
+# Verificar que se pueden filtrar cotizaciones por cliente
+
+pre_sql:
+SELECT COUNT(*) as total FROM "Cotizaciones" WHERE "ClienteId" = 1
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Cotizaciones?clienteId=1' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total FROM "Cotizaciones" WHERE "ClienteId" = 1
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Cotizaciones por Estado
+# Verificar que se pueden filtrar cotizaciones por estado
+
+pre_sql:
+SELECT COUNT(*) as total FROM "Cotizaciones" WHERE "EstadoCotizacion" = 'Pendiente'
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Cotizaciones?estado=Pendiente' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total FROM "Cotizaciones" WHERE "EstadoCotizacion" = 'Pendiente'
+
+assert:
+status_code == 200
+
+---
+
+### Test PUT Actualizar Estado Cotizacion
+# Verificar que se puede cambiar el estado de una cotizacion
+
+pre_sql:
+SELECT "EstadoCotizacion" FROM "Cotizaciones" WHERE "Id" = 1
+
+curl:
+curl -X 'PUT' 'http://localhost:5000/api/Cotizaciones/1/estado' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"estado":"Aprobada"}'
+
+post_sql:
+SELECT "EstadoCotizacion" FROM "Cotizaciones" WHERE "Id" = 1
+
+assert:
+status_code == 204
+
+---
+
+### Test GET Estadisticas Cotizaciones
+# Verificar que se obtienen estadisticas de cotizaciones
+
+pre_sql:
+SELECT COUNT(*) as total, SUM("Total") as suma_total FROM "Cotizaciones"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Cotizaciones/estadisticas' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total FROM "Cotizaciones"
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Cotizaciones por Vendedor
+# Verificar que se pueden filtrar cotizaciones por vendedor
+
+pre_sql:
+SELECT COUNT(*) as total FROM "Cotizaciones" WHERE "VendedorId" = 1
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Cotizaciones?vendedorId=1' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total FROM "Cotizaciones" WHERE "VendedorId" = 1
+
+assert:
+status_code == 200
+
+---
+
+### Test DELETE Cotizacion
+# Verificar que se puede eliminar una cotizacion
+
+pre_sql:
+SELECT COUNT(*) as total_antes FROM "Cotizaciones"
+
+curl:
+curl -X 'DELETE' 'http://localhost:5000/api/Cotizaciones/1' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_despues FROM "Cotizaciones"
+
+assert:
+status_code == 204
+
+---
+

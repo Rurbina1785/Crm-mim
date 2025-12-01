@@ -1,0 +1,54 @@
+### Test Interpolacion - Obtener Producto y Verificar
+# Primero obtener el ID maximo, luego consultar ese producto
+
+psql_1:
+SELECT MAX("Id") as ultimo_id FROM "Productos"
+
+curl_1:
+curl -X 'GET' 'http://localhost:5000/api/Productos/{psql_1["ultimo_id"]}' -H 'accept: application/json'
+
+psql_2:
+SELECT "NombreProducto", "PrecioLista" FROM "Productos" WHERE "Id" = {psql_1["ultimo_id"]}
+
+assert:
+curl_1["id"] == psql_1["ultimo_id"] and curl_1["nombreProducto"] == psql_2["NombreProducto"]
+
+---
+
+### Test Interpolacion - Prospecto por ID
+# Obtener primer prospecto y verificar datos
+
+psql_1:
+SELECT MIN("Id") as primer_id FROM "Prospectos"
+
+curl_1:
+curl -X 'GET' 'http://localhost:5000/api/Prospectos/{psql_1["primer_id"]}' -H 'accept: application/json'
+
+psql_2:
+SELECT "NombreEmpresa", "Email" FROM "Prospectos" WHERE "Id" = {psql_1["primer_id"]}
+
+assert:
+curl_1["id"] == psql_1["primer_id"] and curl_1["nombreEmpresa"] == psql_2["NombreEmpresa"]
+
+---
+
+### Test Interpolacion Multiple - Producto y Categoria
+# Obtener producto y luego su categoria
+
+psql_1:
+SELECT "Id" as producto_id, "CategoriaId" as categoria_id FROM "Productos" WHERE "Id" = 1
+
+curl_1:
+curl -X 'GET' 'http://localhost:5000/api/Productos/{psql_1["producto_id"]}' -H 'accept: application/json'
+
+curl_2:
+curl -X 'GET' 'http://localhost:5000/api/Productos/categorias' -H 'accept: application/json'
+
+psql_2:
+SELECT "NombreCategoria" FROM "CategoriasProducto" WHERE "Id" = {psql_1["categoria_id"]}
+
+assert:
+curl_1["categoriaId"] == psql_1["categoria_id"] and curl_2["status_code"] == 200
+
+---
+

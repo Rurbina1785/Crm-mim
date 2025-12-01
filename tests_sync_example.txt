@@ -1,0 +1,103 @@
+### Test Sincronizacion Simple entre SQL Server y PostgreSQL
+# Verificar que ambas bases de datos tienen el mismo numero de clientes activos
+
+tsql_1:
+SELECT COUNT(*) as total_sqlserver FROM Clientes WHERE Activo = 1
+
+psql_1:
+SELECT COUNT(*) as total_postgres FROM "Clientes" WHERE "EstaActivo" = true
+
+assert:
+tsql_1["total_sqlserver"] == psql_1["total_postgres"]
+
+---
+
+### Test Crear Producto en PostgreSQL
+# Crear un producto nuevo y verificar que se creo correctamente
+
+psql_1:
+SELECT COUNT(*) as total_antes FROM "Productos"
+
+curl_1:
+curl -X 'POST' 'http://localhost:5000/api/Productos' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"nombreProducto":"Producto Test Sync","descripcion":"Producto de prueba","precioUnitario":1500,"categoriaId":1,"codigoSKU":"TEST-SYNC-001"}'
+
+psql_2:
+SELECT COUNT(*) as total_despues, MAX("Id") as ultimo_id FROM "Productos"
+
+psql_3:
+SELECT "NombreProducto", "PrecioLista", "CodigoSKU" FROM "Productos" WHERE "Id" = {psql_2["ultimo_id"]}
+
+assert:
+psql_2["total_despues"] == psql_1["total_antes"] + 1 and curl_1["id"] == psql_2["ultimo_id"] and psql_3["NombreProducto"] == "Producto Test Sync"
+
+---
+
+### Test Flujo Completo con Interpolacion
+# Crear prospecto, obtenerlo por ID y verificar datos
+
+psql_1:
+SELECT COUNT(*) as total FROM "Prospectos"
+
+curl_1:
+curl -X 'POST' 'http://localhost:5000/api/Prospectos' -H 'Content-Type: application/json' -d '{"nombreEmpresa":"Empresa Test","nombreContacto":"Juan Test","email":"juan@test.com","telefono":"555-0001","fuenteProspectoId":1,"sucursalId":1,"vendedorAsignadoId":1}'
+
+psql_2:
+SELECT "CodigoProspecto", "NombreEmpresa", "Email" FROM "Prospectos" WHERE "Id" = {curl_1["id"]}
+
+curl_2:
+curl -X 'GET' 'http://localhost:5000/api/Prospectos/{curl_1["id"]}' -H 'accept: application/json'
+
+psql_3:
+SELECT COUNT(*) as total FROM "Prospectos"
+
+assert:
+curl_1["id"] > 0 and psql_2["NombreEmpresa"] == "Empresa Test" and curl_2["nombreEmpresa"] == psql_2["NombreEmpresa"] and psql_3["total"] == psql_1["total"] + 1
+
+---
+
+### Test Multiples Pasos con Validaciones
+# Crear cliente, agregar contacto, verificar en ambas BD
+
+psql_1:
+SELECT COUNT(*) as total_clientes FROM "Clientes"
+
+curl_1:
+curl -X 'POST' 'http://localhost:5000/api/Clientes' -H 'Content-Type: application/json' -d '{"nombreEmpresa":"Cliente Sync Test","rfc":"CST010101AAA","email":"contacto@clientesync.com","categoriaId":1,"sucursalId":1}'
+
+psql_2:
+SELECT "Id", "NombreEmpresa", "RFC" FROM "Clientes" WHERE "Id" = {curl_1["id"]}
+
+curl_2:
+curl -X 'GET' 'http://localhost:5000/api/Clientes/{curl_1["id"]}' -H 'accept: application/json'
+
+psql_3:
+SELECT COUNT(*) as total_clientes FROM "Clientes"
+
+curl_3:
+curl -X 'POST' 'http://localhost:5000/api/Clientes/{curl_1["id"]}/contactos' -H 'Content-Type: application/json' -d '{"nombreCompleto":"Maria Lopez","cargo":"Gerente","email":"maria@clientesync.com","telefono":"555-1234"}'
+
+psql_4:
+SELECT COUNT(*) as total_contactos FROM "ContactosCliente" WHERE "ClienteId" = {curl_1["id"]}
+
+assert:
+psql_3["total_clientes"] == psql_1["total_clientes"] + 1 and psql_2["RFC"] == "CST010101AAA" and curl_2["nombreEmpresa"] == "Cliente Sync Test" and psql_4["total_contactos"] == 1
+
+---
+
+### Test Solo PostgreSQL sin SQL Server
+# Verificar que funciona sin SQL Server
+
+psql_1:
+SELECT COUNT(*) as total FROM "Productos" WHERE "EstaActivo" = true
+
+curl_1:
+curl -X 'GET' 'http://localhost:5000/api/Productos?activo=true' -H 'accept: application/json'
+
+psql_2:
+SELECT "NombreProducto", "PrecioUnitario" FROM "Productos" WHERE "EstaActivo" = true LIMIT 1
+
+assert:
+psql_1["total"] > 0 and len(curl_1) > 0
+
+---
+

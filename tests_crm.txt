@@ -1,0 +1,154 @@
+### Test GET Prospectos
+# Verificar que el endpoint GET /api/Prospectos devuelve la lista completa
+# de prospectos almacenados en la base de datos.
+
+pre_sql:
+SELECT "Id", "CodigoProspecto", "NombreEmpresa", "EstadoProspecto" FROM "Prospectos" ORDER BY "Id"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Prospectos' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_prospectos FROM "Prospectos"
+
+assert:
+status_code == 200 and len(json) > 0
+
+---
+
+### Test GET Prospecto por ID
+# Verificar que se puede obtener un prospecto especifico por su ID
+
+pre_sql:
+SELECT "Id", "CodigoProspecto", "NombreEmpresa" FROM "Prospectos" WHERE "Id" = 1
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Prospectos/1' -H 'accept: application/json'
+
+post_sql:
+SELECT "FechaActualizacion" FROM "Prospectos" WHERE "Id" = 1
+
+assert:
+status_code == 200 and json['id'] == 1 and json['codigoProspecto'] is not None
+
+---
+
+### Test GET Fuentes de Prospectos
+# Verificar que se obtienen todas las fuentes de prospectos disponibles
+
+pre_sql:
+SELECT "Id", "NombreFuente" FROM "FuentesProspecto" ORDER BY "Id"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Prospectos/fuentes' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_fuentes FROM "FuentesProspecto"
+
+assert:
+status_code == 200 and len(json) == post_sql[0]['total_fuentes']
+
+---
+
+### Test GET Categorias de Clientes
+# Verificar que se obtienen todas las categorias de clientes con sus descuentos
+
+pre_sql:
+SELECT "Id", "NombreCategoria", "PorcentajeDescuento" FROM "CategoriasCliente" ORDER BY "PorcentajeDescuento" DESC
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Clientes/categorias' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_categorias FROM "CategoriasCliente"
+
+assert:
+status_code == 200 and len(json) == 4 and json[0]['porcentajeDescuento'] == 20
+
+---
+
+### Test POST Crear Prospecto
+# Verificar que se puede crear un nuevo prospecto correctamente
+
+pre_sql:
+SELECT COUNT(*) as total_antes FROM "Prospectos"
+
+curl:
+curl -X 'POST' 'http://localhost:5000/api/Prospectos' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"nombreEmpresa":"Test Python Runner","nombreContacto":"Juan","apellidoContacto":"Prueba","email":"juan.prueba@test.com","telefono":"+52-55-1234-5678","fuenteId":1,"sucursalId":1,"vendedorAsignadoId":1,"estadoProspecto":"Nuevo","prioridad":"Alta","valorEstimado":50000,"probabilidadCierre":70}'
+
+post_sql:
+SELECT COUNT(*) as total_despues, MAX("Id") as ultimo_id FROM "Prospectos"
+
+assert:
+status_code == 201 and post_sql[0]['total_despues'] == pre_sql[0]['total_antes'] + 1
+
+---
+
+### Test GET Embudo de Ventas
+# Verificar que se obtienen las estadisticas del embudo de ventas
+
+pre_sql:
+SELECT "EstadoProspecto", COUNT(*) as total FROM "Prospectos" GROUP BY "EstadoProspecto"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Prospectos/embudo-ventas' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(DISTINCT "EstadoProspecto") as estados_distintos FROM "Prospectos"
+
+assert:
+status_code == 200 and len(json) > 0
+
+---
+
+### Test GET Clientes
+# Verificar que se obtiene la lista de clientes (puede estar vacia)
+
+pre_sql:
+SELECT COUNT(*) as total_clientes FROM "Clientes"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Clientes' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_clientes FROM "Clientes"
+
+assert:
+status_code == 200 and len(json) == pre_sql[0]['total_clientes']
+
+---
+
+### Test GET Estadisticas Clientes por Categoria
+# Verificar que se obtienen estadisticas de clientes agrupados por categoria
+
+pre_sql:
+SELECT COUNT(*) as total_categorias FROM "CategoriasCliente"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Clientes/estadisticas-categorias' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_categorias FROM "CategoriasCliente"
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Estadisticas Clientes por Sucursal
+# Verificar que se obtienen estadisticas de clientes agrupados por sucursal
+
+pre_sql:
+SELECT COUNT(*) as total_sucursales FROM "Sucursales"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Clientes/estadisticas-sucursales' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_sucursales FROM "Sucursales"
+
+assert:
+status_code == 200
+
+---
+

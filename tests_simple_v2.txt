@@ -1,0 +1,67 @@
+### Test Contar Productos
+# Verificar que hay productos en la base de datos
+
+psql_1:
+SELECT COUNT(*) as total FROM "Productos"
+
+assert:
+psql_1["total"] > 0
+
+---
+
+### Test Obtener Productos Activos
+# Listar productos activos y verificar que coincide con el conteo
+
+psql_1:
+SELECT COUNT(*) as total_activos FROM "Productos" WHERE "EstaActivo" = true
+
+curl_1:
+curl -X 'GET' 'http://localhost:5000/api/Productos?activo=true' -H 'accept: application/json'
+
+assert:
+psql_1["total_activos"] > 0 and curl_1["status_code"] == 200
+
+---
+
+### Test Obtener Producto por ID
+# Obtener un producto especifico y verificar datos
+
+psql_1:
+SELECT "Id", "NombreProducto", "PrecioLista" FROM "Productos" WHERE "Id" = 1
+
+curl_1:
+curl -X 'GET' 'http://localhost:5000/api/Productos/1' -H 'accept: application/json'
+
+assert:
+psql_1["Id"] == 1 and curl_1["id"] == 1 and curl_1["nombreProducto"] == psql_1["NombreProducto"]
+
+---
+
+### Test Obtener Prospectos
+# Listar prospectos y verificar conteo
+
+psql_1:
+SELECT COUNT(*) as total FROM "Prospectos"
+
+curl_1:
+curl -X 'GET' 'http://localhost:5000/api/Prospectos' -H 'accept: application/json'
+
+assert:
+psql_1["total"] > 0 and curl_1["status_code"] == 200
+
+---
+
+### Test Obtener Fuentes de Prospectos
+# Listar fuentes disponibles
+
+psql_1:
+SELECT COUNT(*) as total_fuentes FROM "FuentesProspecto"
+
+curl_1:
+curl -X 'GET' 'http://localhost:5000/api/Prospectos/fuentes' -H 'accept: application/json'
+
+assert:
+psql_1["total_fuentes"] > 0 and curl_1["status_code"] == 200
+
+---
+

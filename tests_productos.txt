@@ -1,0 +1,170 @@
+### Test GET Productos
+# Verificar que el endpoint GET /api/Productos devuelve la lista de productos
+
+pre_sql:
+SELECT "Id", "CodigoProducto", "NombreProducto", "PrecioLista" FROM "Productos" ORDER BY "Id"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Productos' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_productos FROM "Productos"
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Producto por ID
+# Verificar que se puede obtener un producto especifico por su ID
+
+pre_sql:
+SELECT "Id", "CodigoProducto", "NombreProducto", "PrecioLista" FROM "Productos" WHERE "Id" = 1
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Productos/1' -H 'accept: application/json'
+
+post_sql:
+SELECT "FechaActualizacion" FROM "Productos" WHERE "Id" = 1
+
+assert:
+status_code == 200 and json['id'] == 1
+
+---
+
+### Test GET Categorias de Productos
+# Verificar que se obtienen todas las categorias de productos
+
+pre_sql:
+SELECT "Id", "NombreCategoria" FROM "CategoriasProducto" ORDER BY "Id"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Productos/categorias' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_categorias FROM "CategoriasProducto"
+
+assert:
+status_code == 200 and len(json) > 0
+
+---
+
+### Test GET Estadisticas Productos por Categoria
+# Verificar que se obtienen estadisticas de productos agrupados por categoria
+
+pre_sql:
+SELECT COUNT(DISTINCT "CategoriaId") as categorias_con_productos FROM "Productos"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Productos/estadisticas-categorias' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_categorias FROM "CategoriasProducto"
+
+assert:
+status_code == 200
+
+---
+
+### Test POST Crear Producto
+# Verificar que se puede crear un nuevo producto correctamente
+
+pre_sql:
+SELECT COUNT(*) as total_antes FROM "Productos"
+
+curl:
+curl -X 'POST' 'http://localhost:5000/api/Productos' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"nombreProducto":"Test Python Producto","descripcion":"Producto de prueba","categoriaId":1,"precioUnitario":999.99,"moneda":"MXN","unidadMedida":"Pieza","stockDisponible":100,"stockMinimo":10,"estaActivo":true}'
+
+post_sql:
+SELECT COUNT(*) as total_despues, MAX("Id") as ultimo_id FROM "Productos"
+
+assert:
+status_code == 201 and post_sql[0]['total_despues'] == pre_sql[0]['total_antes'] + 1
+
+---
+
+### Test GET Productos con Filtro por Categoria
+# Verificar que se pueden filtrar productos por categoria
+
+pre_sql:
+SELECT COUNT(*) as total FROM "Productos" WHERE "CategoriaId" = 1
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Productos?categoriaId=1' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total FROM "Productos" WHERE "CategoriaId" = 1
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Productos con Busqueda
+# Verificar que se pueden buscar productos por nombre o codigo
+
+pre_sql:
+SELECT COUNT(*) as total FROM "Productos"
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Productos?busqueda=Test' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total FROM "Productos"
+
+assert:
+status_code == 200
+
+---
+
+### Test GET Productos Activos
+# Verificar que se pueden filtrar productos activos
+
+pre_sql:
+SELECT COUNT(*) as total_activos FROM "Productos" WHERE "EstaActivo" = true
+
+curl:
+curl -X 'GET' 'http://localhost:5000/api/Productos?activo=true' -H 'accept: application/json'
+
+post_sql:
+SELECT COUNT(*) as total_activos FROM "Productos" WHERE "EstaActivo" = true
+
+assert:
+status_code == 200
+
+---
+
+### Test PUT Actualizar Producto
+# Verificar que se puede actualizar un producto existente
+
+pre_sql:
+SELECT "NombreProducto", "PrecioLista" FROM "Productos" WHERE "Id" = 1
+
+curl:
+curl -X 'PUT' 'http://localhost:5000/api/Productos/1' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"nombreProducto":"Producto Actualizado","precioUnitario":1299.99}'
+
+post_sql:
+SELECT "NombreProducto", "PrecioLista", "FechaActualizacion" FROM "Productos" WHERE "Id" = 1
+
+assert:
+status_code == 204
+
+---
+
+### Test DELETE Producto
+# Verificar que se puede desactivar un producto (soft delete)
+
+pre_sql:
+SELECT "EstaActivo" FROM "Productos" WHERE "Id" = 1
+
+curl:
+curl -X 'DELETE' 'http://localhost:5000/api/Productos/1' -H 'accept: application/json'
+
+post_sql:
+SELECT "EstaActivo" FROM "Productos" WHERE "Id" = 1
+
+assert:
+status_code == 204
+
+---
+
