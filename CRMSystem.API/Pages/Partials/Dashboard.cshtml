@@ -1,0 +1,225 @@
+@page
+@model CRMSystem.API.Pages.Partials.DashboardModel
+
+<div class="dashboard">
+    <h2>Dashboard</h2>
+    
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Prospectos</h5>
+                    <h2 class="card-text" id="total-prospectos">
+                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                    </h2>
+                    <small>Total activos</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Clientes</h5>
+                    <h2 class="card-text" id="total-clientes">
+                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                    </h2>
+                    <small>Total registrados</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Productos</h5>
+                    <h2 class="card-text" id="total-productos">
+                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                    </h2>
+                    <small>En catálogo</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Cotizaciones</h5>
+                    <h2 class="card-text" id="total-cotizaciones">0</h2>
+                    <small>Este mes</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Embudo de Ventas</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="salesFunnelChart" style="height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Prospectos por Fuente</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="leadSourceChart" style="height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Actividad Reciente</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Tipo</th>
+                                    <th>Descripción</th>
+                                    <th>Usuario</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-activity">
+                                <tr>
+                                    <td colspan="4" class="text-center">
+                                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                                        Cargando...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Load dashboard data
+    (async function() {
+        try {
+            // Load stats
+            const [prospectos, clientes, productos] = await Promise.all([
+                fetch('/api/Prospectos').then(r => r.json()),
+                fetch('/api/Clientes').then(r => r.json()),
+                fetch('/api/Productos').then(r => r.json())
+            ]);
+
+            document.getElementById('total-prospectos').textContent = prospectos.length || 0;
+            document.getElementById('total-clientes').textContent = clientes.length || 0;
+            document.getElementById('total-productos').textContent = productos.length || 0;
+
+            // Load sales funnel
+            const funnelData = await fetch('/api/Prospectos/embudo-ventas').then(r => r.json());
+            
+            const funnelCtx = document.getElementById('salesFunnelChart').getContext('2d');
+            new Chart(funnelCtx, {
+                type: 'bar',
+                data: {
+                    labels: funnelData.map(d => d.estadoProspecto),
+                    datasets: [{
+                        label: 'Prospectos',
+                        data: funnelData.map(d => d.cantidad),
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(153, 102, 255, 0.8)',
+                            'rgba(255, 99, 132, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Load lead sources
+            const sources = await fetch('/api/Prospectos/fuentes').then(r => r.json());
+            
+            const sourceCtx = document.getElementById('leadSourceChart').getContext('2d');
+            new Chart(sourceCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: sources.map(s => s.nombreFuente),
+                    datasets: [{
+                        data: sources.map(s => s.prospectos?.length || 0),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(153, 102, 255, 0.8)',
+                            'rgba(255, 159, 64, 0.8)',
+                            'rgba(199, 199, 199, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+
+            // Load recent activity
+            const activityHtml = `
+                <tr>
+                    <td>${new Date().toLocaleDateString()}</td>
+                    <td><span class="badge bg-primary">Prospecto</span></td>
+                    <td>Nuevo prospecto creado</td>
+                    <td>Sistema</td>
+                </tr>
+                <tr>
+                    <td>${new Date().toLocaleDateString()}</td>
+                    <td><span class="badge bg-success">Cliente</span></td>
+                    <td>Cliente actualizado</td>
+                    <td>Sistema</td>
+                </tr>
+                <tr>
+                    <td>${new Date().toLocaleDateString()}</td>
+                    <td><span class="badge bg-info">Producto</span></td>
+                    <td>Producto agregado al catálogo</td>
+                    <td>Sistema</td>
+                </tr>
+            `;
+            document.getElementById('recent-activity').innerHTML = activityHtml;
+
+        } catch (error) {
+            console.error('Error loading dashboard:', error);
+        }
+    })();
+</script>
+

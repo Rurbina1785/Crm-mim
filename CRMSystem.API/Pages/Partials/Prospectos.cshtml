@@ -1,0 +1,118 @@
+@page
+@model CRMSystem.API.Pages.Partials.ProspectosModel
+
+<div class="prospectos-module">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Gestión de Prospectos</h2>
+        <button class="btn btn-primary" 
+                hx-get="/Partials/ProspectoForm" 
+                hx-target="#modal-content" 
+                data-bs-toggle="modal" 
+                data-bs-target="#crudModal">
+            <i class="bi bi-plus-circle"></i> Nuevo Prospecto
+        </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <form id="filter-form" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Búsqueda</label>
+                    <input type="text" class="form-control" name="busqueda" placeholder="Nombre o email...">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Estado</label>
+                    <select class="form-select" name="estado">
+                        <option value="">Todos</option>
+                        <option value="Nuevo">Nuevo</option>
+                        <option value="Contactado">Contactado</option>
+                        <option value="Calificado">Calificado</option>
+                        <option value="Propuesta">Propuesta</option>
+                        <option value="Convertido">Convertido</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Fuente</label>
+                    <select class="form-select" name="fuenteId" id="fuente-filter">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Sucursal</label>
+                    <select class="form-select" name="sucursalId">
+                        <option value="">Todas</option>
+                        <option value="1">Norte</option>
+                        <option value="2">Centro</option>
+                        <option value="3">Sur</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="button" class="btn btn-secondary me-2" 
+                            hx-get="/Partials/ProspectosList" 
+                            hx-include="#filter-form" 
+                            hx-target="#prospectos-list">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                    <button type="reset" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Limpiar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Prospectos List -->
+    <div id="prospectos-list" 
+         hx-get="/Partials/ProspectosList" 
+         hx-trigger="load" 
+         hx-swap="innerHTML">
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CRUD Modal -->
+<div class="modal fade" id="crudModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="modal-content">
+            <!-- Form will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Load fuentes for filter
+    fetch('/api/Prospectos/fuentes')
+        .then(r => r.json())
+        .then(fuentes => {
+            const select = document.getElementById('fuente-filter');
+            fuentes.forEach(f => {
+                const option = document.createElement('option');
+                option.value = f.id;
+                option.textContent = f.nombreFuente;
+                select.appendChild(option);
+            });
+        });
+
+    // Refresh list after form submission
+    document.body.addEventListener('htmx:afterRequest', function(evt) {
+        if (evt.detail.successful && evt.detail.pathInfo.requestPath.includes('Prospecto')) {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('crudModal'));
+            if (modal) modal.hide();
+            
+            // Refresh list
+            htmx.trigger('#prospectos-list', 'load');
+            
+            // Show notification
+            if (window.showNotification) {
+                showNotification('Operación exitosa', 'success');
+            }
+        }
+    });
+</script>
+

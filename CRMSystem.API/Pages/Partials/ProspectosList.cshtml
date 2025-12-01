@@ -1,0 +1,129 @@
+@page
+@model CRMSystem.API.Pages.Partials.ProspectosListModel
+@using System.Text.Json
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Empresa</th>
+                        <th>Contacto</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Estado</th>
+                        <th>Fuente</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="prospectos-tbody">
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            Cargando prospectos...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    (async function() {
+        try {
+            // Get filter parameters
+            const form = document.getElementById('filter-form');
+            const params = new URLSearchParams();
+            
+            if (form) {
+                const formData = new FormData(form);
+                for (const [key, value] of formData.entries()) {
+                    if (value) params.append(key, value);
+                }
+            }
+
+            const response = await fetch(`/api/Prospectos?${params}`);
+            const prospectos = await response.json();
+            
+            const tbody = document.getElementById('prospectos-tbody');
+            
+            if (prospectos.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">
+                            No se encontraron prospectos
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = prospectos.map(p => `
+                <tr>
+                    <td><strong>${p.codigoProspecto}</strong></td>
+                    <td>${p.nombreEmpresa}</td>
+                    <td>${p.nombreContacto} ${p.apellidoContacto}</td>
+                    <td><a href="mailto:${p.email}">${p.email}</a></td>
+                    <td>${p.telefono || '-'}</td>
+                    <td>
+                        <span class="badge bg-${getEstadoBadgeClass(p.estadoProspecto)}">
+                            ${p.estadoProspecto}
+                        </span>
+                    </td>
+                    <td>${p.fuente?.nombreFuente || '-'}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button class="btn btn-outline-primary" 
+                                    hx-get="/Partials/ProspectoForm?id=${p.id}" 
+                                    hx-target="#modal-content" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#crudModal"
+                                    title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-outline-success" 
+                                    hx-post="/api/Prospectos/${p.id}/convertir-a-cliente" 
+                                    hx-confirm="¿Convertir este prospecto a cliente?"
+                                    title="Convertir a Cliente">
+                                <i class="bi bi-arrow-right-circle"></i>
+                            </button>
+                            <button class="btn btn-outline-danger" 
+                                    hx-delete="/api/Prospectos/${p.id}" 
+                                    hx-confirm="¿Está seguro de eliminar este prospecto?"
+                                    hx-target="#prospectos-list"
+                                    title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+        } catch (error) {
+            console.error('Error loading prospectos:', error);
+            document.getElementById('prospectos-tbody').innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center text-danger">
+                        Error al cargar prospectos: ${error.message}
+                    </td>
+                </tr>
+            `;
+        }
+    })();
+
+    function getEstadoBadgeClass(estado) {
+        const classes = {
+            'Nuevo': 'primary',
+            'Contactado': 'info',
+            'Calificado': 'warning',
+            'Propuesta': 'secondary',
+            'Convertido': 'success',
+            'Perdido': 'danger'
+        };
+        return classes[estado] || 'secondary';
+    }
+</script>
+
