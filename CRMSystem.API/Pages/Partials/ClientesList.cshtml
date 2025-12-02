@@ -1,0 +1,119 @@
+@page
+@model CRMSystem.API.Pages.Partials.ClientesListModel
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Empresa</th>
+                        <th>RFC</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Categoría</th>
+                        <th>Sucursal</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="clientes-tbody">
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            Cargando clientes...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    (async function() {
+        try {
+            const form = document.getElementById('filter-form-clientes');
+            const params = new URLSearchParams();
+            
+            if (form) {
+                const formData = new FormData(form);
+                for (const [key, value] of formData.entries()) {
+                    if (value) params.append(key, value);
+                }
+            }
+
+            const response = await fetch(`/api/Clientes?${params}`);
+            const clientes = await response.json();
+            
+            const tbody = document.getElementById('clientes-tbody');
+            
+            if (clientes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">
+                            No se encontraron clientes
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = clientes.map(c => `
+                <tr>
+                    <td><strong>${c.codigoCliente}</strong></td>
+                    <td>${c.nombreEmpresa}</td>
+                    <td>${c.rfc || '-'}</td>
+                    <td><a href="mailto:${c.email}">${c.email}</a></td>
+                    <td>${c.telefono || '-'}</td>
+                    <td>
+                        <span class="badge bg-info">
+                            ${c.categoria?.nombreCategoria || '-'}
+                        </span>
+                    </td>
+                    <td>${c.sucursal?.nombreSucursal || '-'}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button class="btn btn-outline-primary" 
+                                    hx-get="/Partials/ClienteForm?id=${c.id}" 
+                                    hx-target="#modal-content" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#crudModal"
+                                    title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-outline-info" 
+                                    onclick="viewClientDetails(${c.id})"
+                                    title="Ver Detalles">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-danger" 
+                                    hx-delete="/api/Clientes/${c.id}" 
+                                    hx-confirm="¿Está seguro de eliminar este cliente?"
+                                    hx-target="#clientes-list"
+                                    title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+        } catch (error) {
+            console.error('Error loading clientes:', error);
+            document.getElementById('clientes-tbody').innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center text-danger">
+                        Error al cargar clientes: ${error.message}
+                    </td>
+                </tr>
+            `;
+        }
+    })();
+
+    function viewClientDetails(id) {
+        // TODO: Implement client details view
+        alert('Ver detalles del cliente #' + id);
+    }
+</script>
+

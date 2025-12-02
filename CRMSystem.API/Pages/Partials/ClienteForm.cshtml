@@ -1,0 +1,184 @@
+@page
+@model CRMSystem.API.Pages.Partials.ClienteFormModel
+
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.ClienteId.HasValue ? "Editar" : "Nuevo") Cliente</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+    <form id="cliente-form">
+        <input type="hidden" id="cliente-id" value="@Model.ClienteId">
+        
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <label class="form-label">Nombre de la Empresa *</label>
+                <input type="text" class="form-control" name="nombreEmpresa" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">RFC *</label>
+                <input type="text" class="form-control" name="rfc" maxlength="13" required>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Email *</label>
+                <input type="email" class="form-control" name="email" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Teléfono</label>
+                <input type="tel" class="form-control" name="telefono">
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Dirección</label>
+            <input type="text" class="form-control" name="direccion">
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Ciudad</label>
+                <input type="text" class="form-control" name="ciudad">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Estado</label>
+                <input type="text" class="form-control" name="estado">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Código Postal</label>
+                <input type="text" class="form-control" name="codigoPostal" maxlength="10">
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Categoría *</label>
+                <select class="form-select" name="categoriaClienteId" id="categoria-select" required>
+                    <option value="">Seleccione...</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Sucursal *</label>
+                <select class="form-select" name="sucursalId" required>
+                    <option value="">Seleccione...</option>
+                    <option value="1">Norte</option>
+                    <option value="2">Centro</option>
+                    <option value="3">Sur</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Vendedor Asignado</label>
+                <select class="form-select" name="vendedorAsignadoId">
+                    <option value="">Sin asignar</option>
+                    <option value="1">Juan Pérez</option>
+                    <option value="2">María García</option>
+                    <option value="3">Carlos López</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Límite de Crédito</label>
+                <input type="number" class="form-control" name="limiteCredito" step="0.01" min="0">
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Notas</label>
+            <textarea class="form-control" name="notas" rows="3"></textarea>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+    <button type="button" class="btn btn-primary" onclick="saveCliente()">Guardar</button>
+</div>
+
+<script>
+    // Load categorias
+    fetch('/api/Clientes/categorias')
+        .then(r => r.json())
+        .then(categorias => {
+            const select = document.getElementById('categoria-select');
+            categorias.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c.id;
+                option.textContent = c.nombreCategoria;
+                select.appendChild(option);
+            });
+        });
+
+    // Load existing cliente if editing
+    const clienteId = document.getElementById('cliente-id').value;
+    if (clienteId) {
+        fetch(`/api/Clientes/${clienteId}`)
+            .then(r => r.json())
+            .then(c => {
+                document.querySelector('[name="nombreEmpresa"]').value = c.nombreEmpresa;
+                document.querySelector('[name="rfc"]').value = c.rfc || '';
+                document.querySelector('[name="email"]').value = c.email;
+                document.querySelector('[name="telefono"]').value = c.telefono || '';
+                document.querySelector('[name="direccion"]').value = c.direccion || '';
+                document.querySelector('[name="ciudad"]').value = c.ciudad || '';
+                document.querySelector('[name="estado"]').value = c.estado || '';
+                document.querySelector('[name="codigoPostal"]').value = c.codigoPostal || '';
+                document.querySelector('[name="categoriaClienteId"]').value = c.categoriaClienteId;
+                document.querySelector('[name="sucursalId"]').value = c.sucursalId;
+                document.querySelector('[name="vendedorAsignadoId"]').value = c.vendedorAsignadoId || '';
+                document.querySelector('[name="limiteCredito"]').value = c.limiteCredito || '';
+                document.querySelector('[name="notas"]').value = c.notas || '';
+            });
+    }
+
+    async function saveCliente() {
+        const form = document.getElementById('cliente-form');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        
+        // Convert IDs to numbers
+        data.categoriaClienteId = parseInt(data.categoriaClienteId);
+        data.sucursalId = parseInt(data.sucursalId);
+        if (data.vendedorAsignadoId) {
+            data.vendedorAsignadoId = parseInt(data.vendedorAsignadoId);
+        }
+        if (data.limiteCredito) {
+            data.limiteCredito = parseFloat(data.limiteCredito);
+        }
+
+        try {
+            const clienteId = document.getElementById('cliente-id').value;
+            const url = clienteId ? `/api/Clientes/${clienteId}` : '/api/Clientes';
+            const method = clienteId ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('crudModal')).hide();
+                htmx.trigger('#clientes-list', 'load');
+                if (window.showNotification) {
+                    showNotification(clienteId ? 'Cliente actualizado' : 'Cliente creado', 'success');
+                }
+            } else {
+                const error = await response.json();
+                alert('Error: ' + (error.title || 'No se pudo guardar el cliente'));
+            }
+        } catch (error) {
+            console.error('Error saving cliente:', error);
+            alert('Error al guardar: ' + error.message);
+        }
+    }
+</script>
+

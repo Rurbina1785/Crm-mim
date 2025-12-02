@@ -1,0 +1,110 @@
+@page
+@model CRMSystem.API.Pages.Partials.ClientesModel
+
+<div class="clientes-module">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Gestión de Clientes</h2>
+        <button class="btn btn-primary" 
+                hx-get="/Partials/ClienteForm" 
+                hx-target="#modal-content" 
+                data-bs-toggle="modal" 
+                data-bs-target="#crudModal">
+            <i class="bi bi-plus-circle"></i> Nuevo Cliente
+        </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <form id="filter-form-clientes" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Búsqueda</label>
+                    <input type="text" class="form-control" name="busqueda" placeholder="Nombre o email...">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Categoría</label>
+                    <select class="form-select" name="categoriaId" id="categoria-filter">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Sucursal</label>
+                    <select class="form-select" name="sucursalId">
+                        <option value="">Todas</option>
+                        <option value="1">Norte</option>
+                        <option value="2">Centro</option>
+                        <option value="3">Sur</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Estado</label>
+                    <select class="form-select" name="activo">
+                        <option value="">Todos</option>
+                        <option value="true">Activos</option>
+                        <option value="false">Inactivos</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="button" class="btn btn-secondary me-2" 
+                            hx-get="/Partials/ClientesList" 
+                            hx-include="#filter-form-clientes" 
+                            hx-target="#clientes-list">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                    <button type="reset" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Limpiar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Clientes List -->
+    <div id="clientes-list" 
+         hx-get="/Partials/ClientesList" 
+         hx-trigger="load" 
+         hx-swap="innerHTML">
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CRUD Modal -->
+<div class="modal fade" id="crudModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="modal-content">
+            <!-- Form will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Load categorias for filter
+    fetch('/api/Clientes/categorias')
+        .then(r => r.json())
+        .then(categorias => {
+            const select = document.getElementById('categoria-filter');
+            categorias.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c.id;
+                option.textContent = c.nombreCategoria;
+                select.appendChild(option);
+            });
+        });
+
+    // Refresh list after form submission
+    document.body.addEventListener('htmx:afterRequest', function(evt) {
+        if (evt.detail.successful && evt.detail.pathInfo.requestPath.includes('Cliente')) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('crudModal'));
+            if (modal) modal.hide();
+            htmx.trigger('#clientes-list', 'load');
+            if (window.showNotification) {
+                showNotification('Operación exitosa', 'success');
+            }
+        }
+    });
+</script>
+

@@ -1,0 +1,198 @@
+@page
+@model CRMSystem.API.Pages.Partials.ProductoFormModel
+
+<div class="modal-header">
+    <h5 class="modal-title">@(Model.ProductoId.HasValue ? "Editar" : "Nuevo") Producto</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+    <form id="producto-form">
+        <input type="hidden" id="producto-id" value="@Model.ProductoId">
+        
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <label class="form-label">Nombre del Producto *</label>
+                <input type="text" class="form-control" name="nombreProducto" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">SKU *</label>
+                <input type="text" class="form-control" name="sku" required>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea class="form-control" name="descripcion" rows="3"></textarea>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Categoría *</label>
+                <select class="form-select" name="categoriaProductoId" id="categoria-select-producto" required>
+                    <option value="">Seleccione...</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Unidad de Medida *</label>
+                <select class="form-select" name="unidadMedida" required>
+                    <option value="">Seleccione...</option>
+                    <option value="Pieza">Pieza</option>
+                    <option value="Caja">Caja</option>
+                    <option value="Paquete">Paquete</option>
+                    <option value="Metro">Metro</option>
+                    <option value="Kilogramo">Kilogramo</option>
+                    <option value="Litro">Litro</option>
+                    <option value="Servicio">Servicio</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Precio Lista *</label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" class="form-control" name="precioLista" step="0.01" min="0" required>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Costo</label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" class="form-control" name="costo" step="0.01" min="0">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Margen (%)</label>
+                <div class="input-group">
+                    <input type="number" class="form-control" id="margen-display" readonly>
+                    <span class="input-group-text">%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Stock Disponible</label>
+                <input type="number" class="form-control" name="stockDisponible" min="0" value="0">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Stock Mínimo</label>
+                <input type="number" class="form-control" name="stockMinimo" min="0" value="0">
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="activo" id="activo-check" checked>
+                <label class="form-check-label" for="activo-check">
+                    Producto activo
+                </label>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+    <button type="button" class="btn btn-primary" onclick="saveProducto()">Guardar</button>
+</div>
+
+<script>
+    // Load categorias
+    fetch('/api/Productos/categorias')
+        .then(r => r.json())
+        .then(categorias => {
+            const select = document.getElementById('categoria-select-producto');
+            categorias.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c.id;
+                option.textContent = c.nombreCategoria;
+                select.appendChild(option);
+            });
+        })
+        .catch(err => console.error('Error loading categorias:', err));
+
+    // Calculate margin when price or cost changes
+    document.querySelector('[name="precioLista"]')?.addEventListener('input', calculateMargin);
+    document.querySelector('[name="costo"]')?.addEventListener('input', calculateMargin);
+
+    function calculateMargin() {
+        const precio = parseFloat(document.querySelector('[name="precioLista"]').value) || 0;
+        const costo = parseFloat(document.querySelector('[name="costo"]').value) || 0;
+        
+        if (precio > 0 && costo > 0) {
+            const margen = ((precio - costo) / precio * 100).toFixed(2);
+            document.getElementById('margen-display').value = margen;
+        } else {
+            document.getElementById('margen-display').value = '';
+        }
+    }
+
+    // Load existing producto if editing
+    const productoId = document.getElementById('producto-id').value;
+    if (productoId) {
+        fetch(`/api/Productos/${productoId}`)
+            .then(r => r.json())
+            .then(p => {
+                document.querySelector('[name="nombreProducto"]').value = p.nombreProducto;
+                document.querySelector('[name="sku"]').value = p.sku;
+                document.querySelector('[name="descripcion"]').value = p.descripcion || '';
+                document.querySelector('[name="categoriaProductoId"]').value = p.categoriaProductoId;
+                document.querySelector('[name="unidadMedida"]').value = p.unidadMedida;
+                document.querySelector('[name="precioLista"]').value = p.precioLista;
+                document.querySelector('[name="costo"]').value = p.costo || '';
+                document.querySelector('[name="stockDisponible"]').value = p.stockDisponible || 0;
+                document.querySelector('[name="stockMinimo"]').value = p.stockMinimo || 0;
+                document.getElementById('activo-check').checked = p.activo !== false;
+                calculateMargin();
+            });
+    }
+
+    async function saveProducto() {
+        const form = document.getElementById('producto-form');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        
+        // Convert types
+        data.categoriaProductoId = parseInt(data.categoriaProductoId);
+        data.precioLista = parseFloat(data.precioLista);
+        if (data.costo) data.costo = parseFloat(data.costo);
+        if (data.stockDisponible) data.stockDisponible = parseInt(data.stockDisponible);
+        if (data.stockMinimo) data.stockMinimo = parseInt(data.stockMinimo);
+        data.activo = document.getElementById('activo-check').checked;
+
+        try {
+            const productoId = document.getElementById('producto-id').value;
+            const url = productoId ? `/api/Productos/${productoId}` : '/api/Productos';
+            const method = productoId ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('crudModal')).hide();
+                htmx.trigger('#productos-list', 'load');
+                if (window.showNotification) {
+                    showNotification(productoId ? 'Producto actualizado' : 'Producto creado', 'success');
+                }
+            } else {
+                const error = await response.json();
+                alert('Error: ' + (error.title || 'No se pudo guardar el producto'));
+            }
+        } catch (error) {
+            console.error('Error saving producto:', error);
+            alert('Error al guardar: ' + error.message);
+        }
+    }
+</script>
+

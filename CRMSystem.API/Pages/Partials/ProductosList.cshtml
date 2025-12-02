@@ -1,0 +1,119 @@
+@page
+@model CRMSystem.API.Pages.Partials.ProductosListModel
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Categoría</th>
+                        <th>Precio Lista</th>
+                        <th>Unidad</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="productos-tbody">
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            Cargando productos...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    (async function() {
+        try {
+            const form = document.getElementById('filter-form-productos');
+            const params = new URLSearchParams();
+            
+            if (form) {
+                const formData = new FormData(form);
+                for (const [key, value] of formData.entries()) {
+                    if (value) params.append(key, value);
+                }
+            }
+
+            const response = await fetch(`/api/Productos?${params}`);
+            const productos = await response.json();
+            
+            const tbody = document.getElementById('productos-tbody');
+            
+            if (productos.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">
+                            No se encontraron productos
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = productos.map(p => `
+                <tr>
+                    <td><strong>${p.sku}</strong></td>
+                    <td>${p.nombreProducto}</td>
+                    <td>${p.descripcion || '-'}</td>
+                    <td>
+                        <span class="badge bg-secondary">
+                            ${p.categoria?.nombreCategoria || '-'}
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <strong>$${parseFloat(p.precioLista).toLocaleString('es-MX', {minimumFractionDigits: 2})}</strong>
+                    </td>
+                    <td>${p.unidadMedida}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button class="btn btn-outline-primary" 
+                                    hx-get="/Partials/ProductoForm?id=${p.id}" 
+                                    hx-target="#modal-content" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#crudModal"
+                                    title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-outline-info" 
+                                    onclick="viewProductDetails(${p.id})"
+                                    title="Ver Detalles">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-danger" 
+                                    hx-delete="/api/Productos/${p.id}" 
+                                    hx-confirm="¿Está seguro de eliminar este producto?"
+                                    hx-target="#productos-list"
+                                    title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+        } catch (error) {
+            console.error('Error loading productos:', error);
+            document.getElementById('productos-tbody').innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center text-danger">
+                        Error al cargar productos: ${error.message}
+                    </td>
+                </tr>
+            `;
+        }
+    })();
+
+    function viewProductDetails(id) {
+        // TODO: Implement product details view
+        alert('Ver detalles del producto #' + id);
+    }
+</script>
+

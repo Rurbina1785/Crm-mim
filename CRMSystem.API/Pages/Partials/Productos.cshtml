@@ -1,0 +1,102 @@
+@page
+@model CRMSystem.API.Pages.Partials.ProductosModel
+
+<div class="productos-module">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Catálogo de Productos</h2>
+        <button class="btn btn-primary" 
+                hx-get="/Partials/ProductoForm" 
+                hx-target="#modal-content" 
+                data-bs-toggle="modal" 
+                data-bs-target="#crudModal">
+            <i class="bi bi-plus-circle"></i> Nuevo Producto
+        </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <form id="filter-form-productos" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Búsqueda</label>
+                    <input type="text" class="form-control" name="busqueda" placeholder="Nombre o SKU...">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Categoría</label>
+                    <select class="form-select" name="categoriaId" id="categoria-filter-productos">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Precio Mínimo</label>
+                    <input type="number" class="form-control" name="precioMin" step="0.01" min="0">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Precio Máximo</label>
+                    <input type="number" class="form-control" name="precioMax" step="0.01" min="0">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="button" class="btn btn-secondary me-2" 
+                            hx-get="/Partials/ProductosList" 
+                            hx-include="#filter-form-productos" 
+                            hx-target="#productos-list">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                    <button type="reset" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Limpiar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Productos List -->
+    <div id="productos-list" 
+         hx-get="/Partials/ProductosList" 
+         hx-trigger="load" 
+         hx-swap="innerHTML">
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CRUD Modal -->
+<div class="modal fade" id="crudModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="modal-content">
+            <!-- Form will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Load categorias for filter
+    fetch('/api/Productos/categorias')
+        .then(r => r.json())
+        .then(categorias => {
+            const select = document.getElementById('categoria-filter-productos');
+            categorias.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c.id;
+                option.textContent = c.nombreCategoria;
+                select.appendChild(option);
+            });
+        })
+        .catch(err => console.error('Error loading categorias:', err));
+
+    // Refresh list after form submission
+    document.body.addEventListener('htmx:afterRequest', function(evt) {
+        if (evt.detail.successful && evt.detail.pathInfo.requestPath.includes('Producto')) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('crudModal'));
+            if (modal) modal.hide();
+            htmx.trigger('#productos-list', 'load');
+            if (window.showNotification) {
+                showNotification('Operación exitosa', 'success');
+            }
+        }
+    });
+</script>
+
