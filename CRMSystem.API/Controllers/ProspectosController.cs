@@ -138,7 +138,7 @@ namespace CRMSystem.API.Controllers
             }
 
             // Validar que existan las entidades relacionadas
-            var fuente = await _context.FuentesProspecto.FindAsync(dto.FuenteId);
+            var fuente = await _context.FuentesProspecto.FindAsync(dto.FuenteProspectoId);
             if (fuente == null)
                 return BadRequest(new { error = "La fuente especificada no existe" });
 
@@ -179,7 +179,7 @@ namespace CRMSystem.API.Controllers
                 ApellidoContacto = dto.ApellidoContacto,
                 Email = dto.Email,
                 Telefono = dto.Telefono,
-                FuenteId = dto.FuenteId,
+                FuenteId = dto.FuenteProspectoId,
                 SucursalId = dto.SucursalId,
                 VendedorAsignadoId = dto.VendedorAsignadoId,
                 EstadoProspecto = dto.EstadoProspecto,
@@ -190,6 +190,12 @@ namespace CRMSystem.API.Controllers
                 FechaCreacion = DateTime.UtcNow,
                 FechaActualizacion = DateTime.UtcNow
             };
+
+            if (string.IsNullOrEmpty(dto.Prioridad))
+            {
+                prospecto.Prioridad = "Media";
+            }
+
 
             _context.Prospectos.Add(prospecto);
             await _context.SaveChangesAsync();

@@ -36,7 +36,7 @@ public class CrearProspectoDto
     public string? Telefono { get; set; }
 
     [Required(ErrorMessage = "La fuente es requerida")]
-    public int FuenteId { get; set; }
+    public int FuenteProspectoId { get; set; }
 
     [Required(ErrorMessage = "La sucursal es requerida")]
     public int SucursalId { get; set; }
