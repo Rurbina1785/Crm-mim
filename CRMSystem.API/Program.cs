@@ -88,9 +88,16 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<ContextoBDCRM>();
     try
     {
-        // Apply pending migrations
-        context.Database.Migrate();
-        Console.WriteLine("Base de datos PostgreSQL inicializada correctamente.");
+        // Only apply migrations if there are pending ones
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            context.Database.Migrate();
+            Console.WriteLine("Migraciones aplicadas correctamente.");
+        }
+        else
+        {
+            Console.WriteLine("Base de datos PostgreSQL ya está actualizada.");
+        }
     }
     catch (Exception ex)
     {
@@ -98,5 +105,5 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.Run();
+app.Run("http://localhost:5000");
 
